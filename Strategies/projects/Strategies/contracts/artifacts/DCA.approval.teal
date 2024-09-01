@@ -16,22 +16,14 @@ int 6
 *
 txn OnCompletion
 +
-switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *create_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED
+switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *call_DeleteApplication *create_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED
 
 *NOT_IMPLEMENTED:
 	// The requested action is not implemented in this contract. Are you using the correct OnComplete? Did you set your app ID?
 	err
 
-// createApplication(address,address,uint64,uint64,uint64,uint64,uint64,uint64)void
+// createApplication(address,address,uint64,uint64,uint64,uint64)void
 *abi_route_createApplication:
-	// endTime: uint64
-	txna ApplicationArgs 8
-	btoi
-
-	// targetBuy: uint64
-	txna ApplicationArgs 7
-	btoi
-
 	// targetSpend: uint64
 	txna ApplicationArgs 6
 	btoi
@@ -55,7 +47,7 @@ switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEM
 	int 32
 	==
 
-	// argument 6 (buyTokenReceiver) for createApplication must be a address
+	// argument 4 (buyTokenReceiver) for createApplication must be a address
 	assert
 
 	// adminAddress: address
@@ -65,17 +57,17 @@ switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEM
 	int 32
 	==
 
-	// argument 7 (adminAddress) for createApplication must be a address
+	// argument 5 (adminAddress) for createApplication must be a address
 	assert
 
-	// execute createApplication(address,address,uint64,uint64,uint64,uint64,uint64,uint64)void
+	// execute createApplication(address,address,uint64,uint64,uint64,uint64)void
 	callsub createApplication
 	int 1
 	return
 
-// createApplication(adminAddress: Address, buyTokenReceiver: Address, balanceTokenId: uint64, buyTokenId: uint64, buyIntervalSeconds: uint64, targetSpend: uint64, targetBuy: uint64, endTime: uint64): void
+// createApplication(adminAddress: Address, buyTokenReceiver: Address, balanceTokenId: uint64, buyTokenId: uint64, buyIntervalSeconds: uint64, targetSpend: uint64): void
 createApplication:
-	proto 8 0
+	proto 6 0
 
 	// contracts/DCA.algo.ts:40
 	// this.balanceTokenId.value = balanceTokenId
@@ -108,45 +100,99 @@ createApplication:
 	app_global_put
 
 	// contracts/DCA.algo.ts:45
+	// this.buyIntervalAmount.value = 0
+	byte 0x627579496e74657276616c416d6f756e74 // "buyIntervalAmount"
+	int 0
+	app_global_put
+
+	// contracts/DCA.algo.ts:46
 	// this.targetSpend.value = targetSpend
 	byte 0x7461726765745370656e64 // "targetSpend"
 	frame_dig -6 // targetSpend: uint64
 	app_global_put
 
-	// contracts/DCA.algo.ts:46
-	// this.targetBuy.value = targetBuy
-	byte 0x746172676574427579 // "targetBuy"
-	frame_dig -7 // targetBuy: uint64
-	app_global_put
-
 	// contracts/DCA.algo.ts:47
-	// this.startTime.value = globals.latestTimestamp
-	byte 0x737461727454696d65 // "startTime"
-	global LatestTimestamp
-	app_global_put
-
-	// contracts/DCA.algo.ts:48
-	// this.endTime.value = endTime
-	byte 0x656e6454696d65 // "endTime"
-	frame_dig -8 // endTime: uint64
-	app_global_put
-
-	// contracts/DCA.algo.ts:49
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
 	app_global_put
 
-	// contracts/DCA.algo.ts:50
+	// contracts/DCA.algo.ts:48
 	// this.buyTokenBalance.value = 0
 	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
 	int 0
 	app_global_put
 
-	// contracts/DCA.algo.ts:51
+	// contracts/DCA.algo.ts:49
 	// this.buyTokenReceiver.value = buyTokenReceiver
 	byte 0x627579546f6b656e5265636569766572 // "buyTokenReceiver"
 	frame_dig -2 // buyTokenReceiver: Address
+	app_global_put
+
+	// contracts/DCA.algo.ts:50
+	// this.buyingTokens.value = false
+	byte 0x627579696e67546f6b656e73 // "buyingTokens"
+	int 0
+	byte 0x00
+	int 0
+	uncover 2
+	setbit
+	app_global_put
+	retsub
+
+// updateParams(uint64,uint64,uint64,uint64)void
+*abi_route_updateParams:
+	// _endTime: uint64
+	txna ApplicationArgs 4
+	btoi
+
+	// _targetBuy: uint64
+	txna ApplicationArgs 3
+	btoi
+
+	// _targetSpend: uint64
+	txna ApplicationArgs 2
+	btoi
+
+	// _buyIntervalSeconds: uint64
+	txna ApplicationArgs 1
+	btoi
+
+	// execute updateParams(uint64,uint64,uint64,uint64)void
+	callsub updateParams
+	int 1
+	return
+
+// updateParams(_buyIntervalSeconds: uint64, _targetSpend: uint64, _targetBuy: uint64, _endTime: uint64): void
+updateParams:
+	proto 4 0
+
+	// contracts/DCA.algo.ts:62
+	// assert(this.txn.sender == this.adminAddress.value, "Only admin can update params")
+	txn Sender
+	byte 0x61646d696e41646472657373 // "adminAddress"
+	app_global_get
+	==
+
+	// Only admin can update params
+	assert
+
+	// contracts/DCA.algo.ts:64
+	// this.buyIntervalSeconds.value = _buyIntervalSeconds
+	byte 0x627579496e74657276616c5365636f6e6473 // "buyIntervalSeconds"
+	frame_dig -1 // _buyIntervalSeconds: uint64
+	app_global_put
+
+	// contracts/DCA.algo.ts:65
+	// this.targetSpend.value = _targetSpend
+	byte 0x7461726765745370656e64 // "targetSpend"
+	frame_dig -2 // _targetSpend: uint64
+	app_global_put
+
+	// contracts/DCA.algo.ts:67
+	// this.lastUpdated.value = globals.latestTimestamp
+	byte 0x6c61737455706461746564 // "lastUpdated"
+	global LatestTimestamp
 	app_global_put
 	retsub
 
@@ -177,28 +223,7 @@ createApplication:
 fundAlgo:
 	proto 2 0
 
-	// *if0_condition
-	// contracts/DCA.algo.ts:55
-	// this.endTime.value > 0
-	byte 0x656e6454696d65 // "endTime"
-	app_global_get
-	int 0
-	>
-	bz *if0_end
-
-	// *if0_consequent
-	// contracts/DCA.algo.ts:56
-	// assert(globals.latestTimestamp < this.endTime.value, "End time has passed")
-	global LatestTimestamp
-	byte 0x656e6454696d65 // "endTime"
-	app_global_get
-	<
-
-	// End time has passed
-	assert
-
-*if0_end:
-	// contracts/DCA.algo.ts:58
+	// contracts/DCA.algo.ts:71
 	// assert(this.txn.sender == this.adminAddress.value, "Only admin can fund")
 	txn Sender
 	byte 0x61646d696e41646472657373 // "adminAddress"
@@ -208,7 +233,7 @@ fundAlgo:
 	// Only admin can fund
 	assert
 
-	// contracts/DCA.algo.ts:60
+	// contracts/DCA.algo.ts:73
 	// verifyPayTxn(payTxn, {
 	//       sender: this.adminAddress.value,
 	//       receiver: this.app.address,
@@ -242,7 +267,7 @@ fundAlgo:
 	// transaction verification failed: {"txn":"payTxn","field":"amount","expected":"quantity"}
 	assert
 
-	// contracts/DCA.algo.ts:65
+	// contracts/DCA.algo.ts:78
 	// this.currentBalance.value += quantity
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	app_global_get
@@ -252,207 +277,124 @@ fundAlgo:
 	swap
 	app_global_put
 
-	// contracts/DCA.algo.ts:66
-	// this.lastUpdated.value = globals.latestTimestamp
-	byte 0x6c61737455706461746564 // "lastUpdated"
-	global LatestTimestamp
-	app_global_put
-	retsub
-
-// updateParams(uint64,uint64,uint64,uint64)void
-*abi_route_updateParams:
-	// _endTime: uint64
-	txna ApplicationArgs 4
-	btoi
-
-	// _targetBuy: uint64
-	txna ApplicationArgs 3
-	btoi
-
-	// _targetSpend: uint64
-	txna ApplicationArgs 2
-	btoi
-
-	// _buyIntervalSeconds: uint64
-	txna ApplicationArgs 1
-	btoi
-
-	// execute updateParams(uint64,uint64,uint64,uint64)void
-	callsub updateParams
-	int 1
-	return
-
-// updateParams(_buyIntervalSeconds: uint64, _targetSpend: uint64, _targetBuy: uint64, _endTime: uint64): void
-updateParams:
-	proto 4 0
-
-	// contracts/DCA.algo.ts:75
-	// assert(this.txn.sender == this.adminAddress.value, "Only admin can update params")
-	txn Sender
-	byte 0x61646d696e41646472657373 // "adminAddress"
-	app_global_get
-	==
-
-	// Only admin can update params
-	assert
-
-	// contracts/DCA.algo.ts:77
-	// this.buyIntervalSeconds.value = _buyIntervalSeconds
-	byte 0x627579496e74657276616c5365636f6e6473 // "buyIntervalSeconds"
-	frame_dig -1 // _buyIntervalSeconds: uint64
-	app_global_put
-
-	// contracts/DCA.algo.ts:78
-	// this.targetSpend.value = _targetSpend
-	byte 0x7461726765745370656e64 // "targetSpend"
-	frame_dig -2 // _targetSpend: uint64
-	app_global_put
-
 	// contracts/DCA.algo.ts:79
-	// this.targetBuy.value = _targetBuy
-	byte 0x746172676574427579 // "targetBuy"
-	frame_dig -3 // _targetBuy: uint64
+	// this.buyIntervalAmount.value = quantity / this.targetSpend.value
+	byte 0x627579496e74657276616c416d6f756e74 // "buyIntervalAmount"
+	frame_dig -2 // quantity: uint64
+	byte 0x7461726765745370656e64 // "targetSpend"
+	app_global_get
+	/
 	app_global_put
 
 	// contracts/DCA.algo.ts:80
-	// this.endTime.value = _endTime
-	byte 0x656e6454696d65 // "endTime"
-	frame_dig -4 // _endTime: uint64
-	app_global_put
-
-	// contracts/DCA.algo.ts:82
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
 	app_global_put
 	retsub
 
-// claimBuyTokens()void
-*abi_route_claimBuyTokens:
-	// execute claimBuyTokens()void
-	callsub claimBuyTokens
+// fundAsset(axfer,uint64)void
+*abi_route_fundAsset:
+	// quantity: uint64
+	txna ApplicationArgs 1
+	btoi
+
+	// assetTxn: axfer
+	txn GroupIndex
+	int 1
+	-
+	dup
+	gtxns TypeEnum
+	int axfer
+	==
+
+	// argument 1 (assetTxn) for fundAsset must be a axfer transaction
+	assert
+
+	// execute fundAsset(axfer,uint64)void
+	callsub fundAsset
 	int 1
 	return
 
-// claimBuyTokens(): void
-claimBuyTokens:
-	proto 0 0
+// fundAsset(assetTxn: AssetTransferTxn, quantity: uint64): void
+fundAsset:
+	proto 2 0
 
-	// contracts/DCA.algo.ts:86
-	// assert(this.txn.sender == this.adminAddress.value, "Only admin can claim buy token")
+	// contracts/DCA.algo.ts:84
+	// assert(this.txn.sender == this.adminAddress.value, "Only admin can fund")
 	txn Sender
 	byte 0x61646d696e41646472657373 // "adminAddress"
 	app_global_get
 	==
 
-	// Only admin can claim buy token
+	// Only admin can fund
 	assert
 
-	// *if1_condition
-	// contracts/DCA.algo.ts:88
-	// this.buyTokenBalance.value > 0
-	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	// contracts/DCA.algo.ts:86
+	// verifyAssetTransferTxn(assetTxn, {
+	//       sender: this.adminAddress.value,
+	//       assetAmount: quantity,
+	//       xferAsset: AssetID.fromUint64(this.balanceTokenId.value),
+	//       assetReceiver: this.app.address,
+	//     })
+	// verify sender
+	frame_dig -1 // assetTxn: AssetTransferTxn
+	gtxns Sender
+	byte 0x61646d696e41646472657373 // "adminAddress"
 	app_global_get
-	int 0
-	>
-	bz *if1_end
-
-	// *if1_consequent
-	// *if2_condition
-	// contracts/DCA.algo.ts:89
-	// this.buyTokenId.value === 0
-	byte 0x627579546f6b656e4964 // "buyTokenId"
-	app_global_get
-	int 0
 	==
-	bz *if2_else
 
-	// *if2_consequent
-	// contracts/DCA.algo.ts:90
-	// sendPayment({
-	//           amount: this.buyTokenBalance.value,
-	//           sender: this.app.address,
-	//           receiver: this.buyTokenReceiver.value,
-	//           fee: 1000,
-	//         })
-	itxn_begin
-	int pay
-	itxn_field TypeEnum
+	// transaction verification failed: {"txn":"assetTxn","field":"sender","expected":"this.adminAddress.value"}
+	assert
 
-	// contracts/DCA.algo.ts:91
-	// amount: this.buyTokenBalance.value
-	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	// verify assetAmount
+	frame_dig -1 // assetTxn: AssetTransferTxn
+	gtxns AssetAmount
+	frame_dig -2 // quantity: uint64
+	==
+
+	// transaction verification failed: {"txn":"assetTxn","field":"assetAmount","expected":"quantity"}
+	assert
+
+	// verify xferAsset
+	frame_dig -1 // assetTxn: AssetTransferTxn
+	gtxns XferAsset
+	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
 	app_global_get
-	itxn_field Amount
+	==
+
+	// transaction verification failed: {"txn":"assetTxn","field":"xferAsset","expected":"AssetID.fromUint64(this.balanceTokenId.value)"}
+	assert
+
+	// verify assetReceiver
+	frame_dig -1 // assetTxn: AssetTransferTxn
+	gtxns AssetReceiver
+	global CurrentApplicationAddress
+	==
+
+	// transaction verification failed: {"txn":"assetTxn","field":"assetReceiver","expected":"this.app.address"}
+	assert
 
 	// contracts/DCA.algo.ts:92
-	// sender: this.app.address
-	global CurrentApplicationAddress
-	itxn_field Sender
+	// this.currentBalance.value += quantity
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	frame_dig -2 // quantity: uint64
+	+
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	swap
+	app_global_put
 
 	// contracts/DCA.algo.ts:93
-	// receiver: this.buyTokenReceiver.value
-	byte 0x627579546f6b656e5265636569766572 // "buyTokenReceiver"
+	// this.buyIntervalAmount.value = quantity / this.targetSpend.value
+	byte 0x627579496e74657276616c416d6f756e74 // "buyIntervalAmount"
+	frame_dig -2 // quantity: uint64
+	byte 0x7461726765745370656e64 // "targetSpend"
 	app_global_get
-	itxn_field Receiver
+	/
+	app_global_put
 
 	// contracts/DCA.algo.ts:94
-	// fee: 1000
-	int 1000
-	itxn_field Fee
-
-	// Submit inner transaction
-	itxn_submit
-	b *if2_end
-
-*if2_else:
-	// contracts/DCA.algo.ts:97
-	// sendAssetTransfer({
-	//           assetAmount: this.buyTokenBalance.value,
-	//           sender: this.app.address,
-	//           assetReceiver: this.buyTokenReceiver.value,
-	//           xferAsset: AssetID.fromUint64(this.buyTokenId.value),
-	//           fee: 1000,
-	//         })
-	itxn_begin
-	int axfer
-	itxn_field TypeEnum
-
-	// contracts/DCA.algo.ts:98
-	// assetAmount: this.buyTokenBalance.value
-	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
-	app_global_get
-	itxn_field AssetAmount
-
-	// contracts/DCA.algo.ts:99
-	// sender: this.app.address
-	global CurrentApplicationAddress
-	itxn_field Sender
-
-	// contracts/DCA.algo.ts:100
-	// assetReceiver: this.buyTokenReceiver.value
-	byte 0x627579546f6b656e5265636569766572 // "buyTokenReceiver"
-	app_global_get
-	itxn_field AssetReceiver
-
-	// contracts/DCA.algo.ts:101
-	// xferAsset: AssetID.fromUint64(this.buyTokenId.value)
-	byte 0x627579546f6b656e4964 // "buyTokenId"
-	app_global_get
-	itxn_field XferAsset
-
-	// contracts/DCA.algo.ts:102
-	// fee: 1000
-	int 1000
-	itxn_field Fee
-
-	// Submit inner transaction
-	itxn_submit
-
-*if2_end:
-
-*if1_end:
-	// contracts/DCA.algo.ts:106
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -477,7 +419,7 @@ removeFunds:
 	// Push empty bytes after the frame pointer to reserve space for local variables
 	byte 0x
 
-	// contracts/DCA.algo.ts:110
+	// contracts/DCA.algo.ts:98
 	// assert(this.txn.sender == this.adminAddress.value, "Only admin can remove funds")
 	txn Sender
 	byte 0x61646d696e41646472657373 // "adminAddress"
@@ -487,7 +429,7 @@ removeFunds:
 	// Only admin can remove funds
 	assert
 
-	// contracts/DCA.algo.ts:111
+	// contracts/DCA.algo.ts:99
 	// assetQuantity = quantity > 0 ? quantity : this.currentBalance.value
 	frame_dig -1 // quantity: uint64
 	int 0
@@ -503,17 +445,17 @@ removeFunds:
 *ternary0_end:
 	frame_bury 0 // assetQuantity: uint64
 
-	// *if3_condition
-	// contracts/DCA.algo.ts:112
+	// *if0_condition
+	// contracts/DCA.algo.ts:100
 	// this.balanceTokenId.value === 0
 	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
 	app_global_get
 	int 0
 	==
-	bz *if3_else
+	bz *if0_else
 
-	// *if3_consequent
-	// contracts/DCA.algo.ts:113
+	// *if0_consequent
+	// contracts/DCA.algo.ts:101
 	// sendPayment({
 	//         amount: assetQuantity,
 	//         sender: this.app.address,
@@ -524,33 +466,33 @@ removeFunds:
 	int pay
 	itxn_field TypeEnum
 
-	// contracts/DCA.algo.ts:114
+	// contracts/DCA.algo.ts:102
 	// amount: assetQuantity
 	frame_dig 0 // assetQuantity: uint64
 	itxn_field Amount
 
-	// contracts/DCA.algo.ts:115
+	// contracts/DCA.algo.ts:103
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
 
-	// contracts/DCA.algo.ts:116
+	// contracts/DCA.algo.ts:104
 	// receiver: this.adminAddress.value
 	byte 0x61646d696e41646472657373 // "adminAddress"
 	app_global_get
 	itxn_field Receiver
 
-	// contracts/DCA.algo.ts:117
+	// contracts/DCA.algo.ts:105
 	// fee: 1000
 	int 1000
 	itxn_field Fee
 
 	// Submit inner transaction
 	itxn_submit
-	b *if3_end
+	b *if0_end
 
-*if3_else:
-	// contracts/DCA.algo.ts:120
+*if0_else:
+	// contracts/DCA.algo.ts:108
 	// sendAssetTransfer({
 	//         assetAmount: assetQuantity,
 	//         sender: this.app.address,
@@ -562,29 +504,29 @@ removeFunds:
 	int axfer
 	itxn_field TypeEnum
 
-	// contracts/DCA.algo.ts:121
+	// contracts/DCA.algo.ts:109
 	// assetAmount: assetQuantity
 	frame_dig 0 // assetQuantity: uint64
 	itxn_field AssetAmount
 
-	// contracts/DCA.algo.ts:122
+	// contracts/DCA.algo.ts:110
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
 
-	// contracts/DCA.algo.ts:123
+	// contracts/DCA.algo.ts:111
 	// assetReceiver: this.adminAddress.value
 	byte 0x61646d696e41646472657373 // "adminAddress"
 	app_global_get
 	itxn_field AssetReceiver
 
-	// contracts/DCA.algo.ts:124
+	// contracts/DCA.algo.ts:112
 	// xferAsset: AssetID.fromUint64(this.balanceTokenId.value)
 	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
 	app_global_get
 	itxn_field XferAsset
 
-	// contracts/DCA.algo.ts:125
+	// contracts/DCA.algo.ts:113
 	// fee: 1000
 	int 1000
 	itxn_field Fee
@@ -592,8 +534,8 @@ removeFunds:
 	// Submit inner transaction
 	itxn_submit
 
-*if3_end:
-	// contracts/DCA.algo.ts:129
+*if0_end:
+	// contracts/DCA.algo.ts:117
 	// this.currentBalance.value -= quantity
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	app_global_get
@@ -603,15 +545,780 @@ removeFunds:
 	swap
 	app_global_put
 
-	// contracts/DCA.algo.ts:130
+	// contracts/DCA.algo.ts:118
+	// this.buyIntervalAmount.value = quantity / this.targetSpend.value
+	byte 0x627579496e74657276616c416d6f756e74 // "buyIntervalAmount"
+	frame_dig -1 // quantity: uint64
+	byte 0x7461726765745370656e64 // "targetSpend"
+	app_global_get
+	/
+	app_global_put
+
+	// contracts/DCA.algo.ts:119
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
 	app_global_put
 	retsub
 
+// claimBuyTokens()void
+*abi_route_claimBuyTokens:
+	// execute claimBuyTokens()void
+	callsub claimBuyTokens
+	int 1
+	return
+
+// claimBuyTokens(): void
+claimBuyTokens:
+	proto 0 0
+
+	// contracts/DCA.algo.ts:123
+	// assert(this.txn.sender == this.adminAddress.value, "Only admin can claim buy token")
+	txn Sender
+	byte 0x61646d696e41646472657373 // "adminAddress"
+	app_global_get
+	==
+
+	// Only admin can claim buy token
+	assert
+
+	// *if1_condition
+	// contracts/DCA.algo.ts:125
+	// this.buyTokenBalance.value > 0
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	app_global_get
+	int 0
+	>
+	bz *if1_end
+
+	// *if1_consequent
+	// *if2_condition
+	// contracts/DCA.algo.ts:126
+	// this.buyTokenId.value === 0
+	byte 0x627579546f6b656e4964 // "buyTokenId"
+	app_global_get
+	int 0
+	==
+	bz *if2_else
+
+	// *if2_consequent
+	// contracts/DCA.algo.ts:127
+	// sendPayment({
+	//           amount: this.buyTokenBalance.value,
+	//           sender: this.app.address,
+	//           receiver: this.buyTokenReceiver.value,
+	//           fee: 1000,
+	//         })
+	itxn_begin
+	int pay
+	itxn_field TypeEnum
+
+	// contracts/DCA.algo.ts:128
+	// amount: this.buyTokenBalance.value
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	app_global_get
+	itxn_field Amount
+
+	// contracts/DCA.algo.ts:129
+	// sender: this.app.address
+	global CurrentApplicationAddress
+	itxn_field Sender
+
+	// contracts/DCA.algo.ts:130
+	// receiver: this.buyTokenReceiver.value
+	byte 0x627579546f6b656e5265636569766572 // "buyTokenReceiver"
+	app_global_get
+	itxn_field Receiver
+
+	// contracts/DCA.algo.ts:131
+	// fee: 1000
+	int 1000
+	itxn_field Fee
+
+	// Submit inner transaction
+	itxn_submit
+	b *if2_end
+
+*if2_else:
+	// contracts/DCA.algo.ts:134
+	// sendAssetTransfer({
+	//           assetAmount: this.buyTokenBalance.value,
+	//           sender: this.app.address,
+	//           assetReceiver: this.buyTokenReceiver.value,
+	//           xferAsset: AssetID.fromUint64(this.buyTokenId.value),
+	//           fee: 1000,
+	//         })
+	itxn_begin
+	int axfer
+	itxn_field TypeEnum
+
+	// contracts/DCA.algo.ts:135
+	// assetAmount: this.buyTokenBalance.value
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	app_global_get
+	itxn_field AssetAmount
+
+	// contracts/DCA.algo.ts:136
+	// sender: this.app.address
+	global CurrentApplicationAddress
+	itxn_field Sender
+
+	// contracts/DCA.algo.ts:137
+	// assetReceiver: this.buyTokenReceiver.value
+	byte 0x627579546f6b656e5265636569766572 // "buyTokenReceiver"
+	app_global_get
+	itxn_field AssetReceiver
+
+	// contracts/DCA.algo.ts:138
+	// xferAsset: AssetID.fromUint64(this.buyTokenId.value)
+	byte 0x627579546f6b656e4964 // "buyTokenId"
+	app_global_get
+	itxn_field XferAsset
+
+	// contracts/DCA.algo.ts:139
+	// fee: 1000
+	int 1000
+	itxn_field Fee
+
+	// Submit inner transaction
+	itxn_submit
+
+*if2_end:
+
+*if1_end:
+	// contracts/DCA.algo.ts:143
+	// this.buyTokenBalance.value = 0
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	int 0
+	app_global_put
+
+	// contracts/DCA.algo.ts:144
+	// this.lastUpdated.value = globals.latestTimestamp
+	byte 0x6c61737455706461746564 // "lastUpdated"
+	global LatestTimestamp
+	app_global_put
+	retsub
+
+// transferFundsForSwap(uint64)void
+*abi_route_transferFundsForSwap:
+	// assetId: uint64
+	txna ApplicationArgs 1
+	btoi
+
+	// execute transferFundsForSwap(uint64)void
+	callsub transferFundsForSwap
+	int 1
+	return
+
+// transferFundsForSwap(assetId: uint64): void
+transferFundsForSwap:
+	proto 1 0
+
+	// Push empty bytes after the frame pointer to reserve space for local variables
+	byte 0x
+
+	// contracts/DCA.algo.ts:148
+	// assert(this.txn.sender == this.swapWalletAddress.value, "Only swap wallet can transfer funds for swap")
+	txn Sender
+	byte 0x7377617057616c6c657441646472657373 // "swapWalletAddress"
+	app_global_get
+	==
+
+	// Only swap wallet can transfer funds for swap
+	assert
+
+	// contracts/DCA.algo.ts:149
+	// assert(this.balanceTokenId.value === assetId, "Invalid balance asset id")
+	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
+	app_global_get
+	frame_dig -1 // assetId: uint64
+	==
+
+	// Invalid balance asset id
+	assert
+
+	// contracts/DCA.algo.ts:150
+	// assert(this.currentBalance.value > 0, "No current balance")
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	int 0
+	>
+
+	// No current balance
+	assert
+
+	// contracts/DCA.algo.ts:151
+	// assert(this.targetSpend.value > 0, "Invalid target spend")
+	byte 0x7461726765745370656e64 // "targetSpend"
+	app_global_get
+	int 0
+	>
+
+	// Invalid target spend
+	assert
+
+	// contracts/DCA.algo.ts:152
+	// assetQuantity = this.buyIntervalAmount.value
+	byte 0x627579496e74657276616c416d6f756e74 // "buyIntervalAmount"
+	app_global_get
+	frame_bury 0 // assetQuantity: uint64
+
+	// *if3_condition
+	// contracts/DCA.algo.ts:154
+	// this.currentBalance.value < this.buyIntervalAmount.value
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	byte 0x627579496e74657276616c416d6f756e74 // "buyIntervalAmount"
+	app_global_get
+	<
+	bz *if3_end
+
+	// *if3_consequent
+	// contracts/DCA.algo.ts:155
+	// assetQuantity = this.currentBalance.value
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	frame_bury 0 // assetQuantity: uint64
+
+*if3_end:
+	// *if4_condition
+	// contracts/DCA.algo.ts:158
+	// this.balanceTokenId.value === 0
+	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
+	app_global_get
+	int 0
+	==
+	bz *if4_end
+
+	// *if4_consequent
+	// contracts/DCA.algo.ts:159
+	// sendPayment({
+	//         amount: assetQuantity,
+	//         sender: this.app.address,
+	//         receiver: this.swapWalletAddress.value,
+	//         fee: 1000,
+	//       })
+	itxn_begin
+	int pay
+	itxn_field TypeEnum
+
+	// contracts/DCA.algo.ts:160
+	// amount: assetQuantity
+	frame_dig 0 // assetQuantity: uint64
+	itxn_field Amount
+
+	// contracts/DCA.algo.ts:161
+	// sender: this.app.address
+	global CurrentApplicationAddress
+	itxn_field Sender
+
+	// contracts/DCA.algo.ts:162
+	// receiver: this.swapWalletAddress.value
+	byte 0x7377617057616c6c657441646472657373 // "swapWalletAddress"
+	app_global_get
+	itxn_field Receiver
+
+	// contracts/DCA.algo.ts:163
+	// fee: 1000
+	int 1000
+	itxn_field Fee
+
+	// Submit inner transaction
+	itxn_submit
+
+*if4_end:
+	// *if5_condition
+	// contracts/DCA.algo.ts:166
+	// this.balanceTokenId.value !== 0
+	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
+	app_global_get
+	int 0
+	!=
+	bz *if5_end
+
+	// *if5_consequent
+	// contracts/DCA.algo.ts:167
+	// sendAssetTransfer({
+	//         assetAmount: assetQuantity,
+	//         sender: this.app.address,
+	//         assetReceiver: this.swapWalletAddress.value,
+	//         xferAsset: AssetID.fromUint64(this.balanceTokenId.value),
+	//         fee: 1000,
+	//       })
+	itxn_begin
+	int axfer
+	itxn_field TypeEnum
+
+	// contracts/DCA.algo.ts:168
+	// assetAmount: assetQuantity
+	frame_dig 0 // assetQuantity: uint64
+	itxn_field AssetAmount
+
+	// contracts/DCA.algo.ts:169
+	// sender: this.app.address
+	global CurrentApplicationAddress
+	itxn_field Sender
+
+	// contracts/DCA.algo.ts:170
+	// assetReceiver: this.swapWalletAddress.value
+	byte 0x7377617057616c6c657441646472657373 // "swapWalletAddress"
+	app_global_get
+	itxn_field AssetReceiver
+
+	// contracts/DCA.algo.ts:171
+	// xferAsset: AssetID.fromUint64(this.balanceTokenId.value)
+	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
+	app_global_get
+	itxn_field XferAsset
+
+	// contracts/DCA.algo.ts:172
+	// fee: 1000
+	int 1000
+	itxn_field Fee
+
+	// Submit inner transaction
+	itxn_submit
+
+*if5_end:
+	// contracts/DCA.algo.ts:176
+	// this.buyingTokens.value = true
+	byte 0x627579696e67546f6b656e73 // "buyingTokens"
+	int 1
+	byte 0x00
+	int 0
+	uncover 2
+	setbit
+	app_global_put
+	retsub
+
+// receiveBoughtTokensAlgo(pay,uint64)void
+*abi_route_receiveBoughtTokensAlgo:
+	// quantity: uint64
+	txna ApplicationArgs 1
+	btoi
+
+	// payTxn: pay
+	txn GroupIndex
+	int 1
+	-
+	dup
+	gtxns TypeEnum
+	int pay
+	==
+
+	// argument 1 (payTxn) for receiveBoughtTokensAlgo must be a pay transaction
+	assert
+
+	// execute receiveBoughtTokensAlgo(pay,uint64)void
+	callsub receiveBoughtTokensAlgo
+	int 1
+	return
+
+// receiveBoughtTokensAlgo(payTxn: PayTxn, quantity: uint64): void
+receiveBoughtTokensAlgo:
+	proto 2 0
+
+	// contracts/DCA.algo.ts:180
+	// assert(this.txn.sender == this.swapWalletAddress.value, "Only swap wallet can send bought tokens")
+	txn Sender
+	byte 0x7377617057616c6c657441646472657373 // "swapWalletAddress"
+	app_global_get
+	==
+
+	// Only swap wallet can send bought tokens
+	assert
+
+	// contracts/DCA.algo.ts:181
+	// verifyPayTxn(payTxn, {
+	//       sender: this.swapWalletAddress.value,
+	//       receiver: this.app.address,
+	//       amount: quantity,
+	//     })
+	// verify sender
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Sender
+	byte 0x7377617057616c6c657441646472657373 // "swapWalletAddress"
+	app_global_get
+	==
+
+	// transaction verification failed: {"txn":"payTxn","field":"sender","expected":"this.swapWalletAddress.value"}
+	assert
+
+	// verify receiver
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Receiver
+	global CurrentApplicationAddress
+	==
+
+	// transaction verification failed: {"txn":"payTxn","field":"receiver","expected":"this.app.address"}
+	assert
+
+	// verify amount
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Amount
+	frame_dig -2 // quantity: uint64
+	==
+
+	// transaction verification failed: {"txn":"payTxn","field":"amount","expected":"quantity"}
+	assert
+
+	// contracts/DCA.algo.ts:186
+	// this.buyingTokens.value = false
+	byte 0x627579696e67546f6b656e73 // "buyingTokens"
+	int 0
+	byte 0x00
+	int 0
+	uncover 2
+	setbit
+	app_global_put
+
+	// contracts/DCA.algo.ts:187
+	// this.buyTokenBalance.value += quantity
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	app_global_get
+	frame_dig -2 // quantity: uint64
+	+
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	swap
+	app_global_put
+	retsub
+
+// receiveBoughtTokensAsset(axfer,uint64)void
+*abi_route_receiveBoughtTokensAsset:
+	// quantity: uint64
+	txna ApplicationArgs 1
+	btoi
+
+	// assetTxn: axfer
+	txn GroupIndex
+	int 1
+	-
+	dup
+	gtxns TypeEnum
+	int axfer
+	==
+
+	// argument 1 (assetTxn) for receiveBoughtTokensAsset must be a axfer transaction
+	assert
+
+	// execute receiveBoughtTokensAsset(axfer,uint64)void
+	callsub receiveBoughtTokensAsset
+	int 1
+	return
+
+// receiveBoughtTokensAsset(assetTxn: AssetTransferTxn, quantity: uint64): void
+receiveBoughtTokensAsset:
+	proto 2 0
+
+	// contracts/DCA.algo.ts:191
+	// assert(this.txn.sender == this.swapWalletAddress.value, "Only swap wallet can send bought tokens")
+	txn Sender
+	byte 0x7377617057616c6c657441646472657373 // "swapWalletAddress"
+	app_global_get
+	==
+
+	// Only swap wallet can send bought tokens
+	assert
+
+	// contracts/DCA.algo.ts:192
+	// verifyAssetTransferTxn(assetTxn, {
+	//       sender: this.swapWalletAddress.value,
+	//       assetAmount: quantity,
+	//       xferAsset: AssetID.fromUint64(this.buyTokenId.value),
+	//       assetReceiver: this.app.address,
+	//     })
+	// verify sender
+	frame_dig -1 // assetTxn: AssetTransferTxn
+	gtxns Sender
+	byte 0x7377617057616c6c657441646472657373 // "swapWalletAddress"
+	app_global_get
+	==
+
+	// transaction verification failed: {"txn":"assetTxn","field":"sender","expected":"this.swapWalletAddress.value"}
+	assert
+
+	// verify assetAmount
+	frame_dig -1 // assetTxn: AssetTransferTxn
+	gtxns AssetAmount
+	frame_dig -2 // quantity: uint64
+	==
+
+	// transaction verification failed: {"txn":"assetTxn","field":"assetAmount","expected":"quantity"}
+	assert
+
+	// verify xferAsset
+	frame_dig -1 // assetTxn: AssetTransferTxn
+	gtxns XferAsset
+	byte 0x627579546f6b656e4964 // "buyTokenId"
+	app_global_get
+	==
+
+	// transaction verification failed: {"txn":"assetTxn","field":"xferAsset","expected":"AssetID.fromUint64(this.buyTokenId.value)"}
+	assert
+
+	// verify assetReceiver
+	frame_dig -1 // assetTxn: AssetTransferTxn
+	gtxns AssetReceiver
+	global CurrentApplicationAddress
+	==
+
+	// transaction verification failed: {"txn":"assetTxn","field":"assetReceiver","expected":"this.app.address"}
+	assert
+
+	// contracts/DCA.algo.ts:198
+	// this.buyingTokens.value = false
+	byte 0x627579696e67546f6b656e73 // "buyingTokens"
+	int 0
+	byte 0x00
+	int 0
+	uncover 2
+	setbit
+	app_global_put
+
+	// contracts/DCA.algo.ts:199
+	// this.buyTokenBalance.value += quantity
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	app_global_get
+	frame_dig -2 // quantity: uint64
+	+
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	swap
+	app_global_put
+	retsub
+
+// deleteApplication()void
+*abi_route_deleteApplication:
+	// execute deleteApplication()void
+	callsub deleteApplication
+	int 1
+	return
+
+// deleteApplication(): void
+deleteApplication:
+	proto 0 0
+
+	// contracts/DCA.algo.ts:203
+	// assert(this.txn.sender == this.adminAddress.value, "Only admin can delete application")
+	txn Sender
+	byte 0x61646d696e41646472657373 // "adminAddress"
+	app_global_get
+	==
+
+	// Only admin can delete application
+	assert
+
+	// *if6_condition
+	// contracts/DCA.algo.ts:204
+	// this.currentBalance.value > 0
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	int 0
+	>
+	bz *if6_end
+
+	// *if6_consequent
+	// *if7_condition
+	// contracts/DCA.algo.ts:205
+	// this.balanceTokenId.value === 0
+	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
+	app_global_get
+	int 0
+	==
+	bz *if7_else
+
+	// *if7_consequent
+	// contracts/DCA.algo.ts:206
+	// sendPayment({
+	//           amount: this.currentBalance.value,
+	//           sender: this.app.address,
+	//           receiver: this.adminAddress.value,
+	//           fee: 1000,
+	//         })
+	itxn_begin
+	int pay
+	itxn_field TypeEnum
+
+	// contracts/DCA.algo.ts:207
+	// amount: this.currentBalance.value
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	itxn_field Amount
+
+	// contracts/DCA.algo.ts:208
+	// sender: this.app.address
+	global CurrentApplicationAddress
+	itxn_field Sender
+
+	// contracts/DCA.algo.ts:209
+	// receiver: this.adminAddress.value
+	byte 0x61646d696e41646472657373 // "adminAddress"
+	app_global_get
+	itxn_field Receiver
+
+	// contracts/DCA.algo.ts:210
+	// fee: 1000
+	int 1000
+	itxn_field Fee
+
+	// Submit inner transaction
+	itxn_submit
+	b *if7_end
+
+*if7_else:
+	// contracts/DCA.algo.ts:213
+	// sendAssetTransfer({
+	//           assetAmount: this.currentBalance.value,
+	//           sender: this.app.address,
+	//           assetReceiver: this.adminAddress.value,
+	//           xferAsset: AssetID.fromUint64(this.balanceTokenId.value),
+	//           fee: 1000,
+	//         })
+	itxn_begin
+	int axfer
+	itxn_field TypeEnum
+
+	// contracts/DCA.algo.ts:214
+	// assetAmount: this.currentBalance.value
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	itxn_field AssetAmount
+
+	// contracts/DCA.algo.ts:215
+	// sender: this.app.address
+	global CurrentApplicationAddress
+	itxn_field Sender
+
+	// contracts/DCA.algo.ts:216
+	// assetReceiver: this.adminAddress.value
+	byte 0x61646d696e41646472657373 // "adminAddress"
+	app_global_get
+	itxn_field AssetReceiver
+
+	// contracts/DCA.algo.ts:217
+	// xferAsset: AssetID.fromUint64(this.balanceTokenId.value)
+	byte 0x62616c616e6365546f6b656e4964 // "balanceTokenId"
+	app_global_get
+	itxn_field XferAsset
+
+	// contracts/DCA.algo.ts:218
+	// fee: 1000
+	int 1000
+	itxn_field Fee
+
+	// Submit inner transaction
+	itxn_submit
+
+*if7_end:
+
+*if6_end:
+	// *if8_condition
+	// contracts/DCA.algo.ts:222
+	// this.buyTokenBalance.value > 0
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	app_global_get
+	int 0
+	>
+	bz *if8_end
+
+	// *if8_consequent
+	// *if9_condition
+	// contracts/DCA.algo.ts:223
+	// this.buyTokenId.value === 0
+	byte 0x627579546f6b656e4964 // "buyTokenId"
+	app_global_get
+	int 0
+	==
+	bz *if9_else
+
+	// *if9_consequent
+	// contracts/DCA.algo.ts:224
+	// sendPayment({
+	//           amount: this.buyTokenBalance.value,
+	//           sender: this.app.address,
+	//           receiver: this.adminAddress.value,
+	//           fee: 1000,
+	//         })
+	itxn_begin
+	int pay
+	itxn_field TypeEnum
+
+	// contracts/DCA.algo.ts:225
+	// amount: this.buyTokenBalance.value
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	app_global_get
+	itxn_field Amount
+
+	// contracts/DCA.algo.ts:226
+	// sender: this.app.address
+	global CurrentApplicationAddress
+	itxn_field Sender
+
+	// contracts/DCA.algo.ts:227
+	// receiver: this.adminAddress.value
+	byte 0x61646d696e41646472657373 // "adminAddress"
+	app_global_get
+	itxn_field Receiver
+
+	// contracts/DCA.algo.ts:228
+	// fee: 1000
+	int 1000
+	itxn_field Fee
+
+	// Submit inner transaction
+	itxn_submit
+	b *if9_end
+
+*if9_else:
+	// contracts/DCA.algo.ts:231
+	// sendAssetTransfer({
+	//           assetAmount: this.buyTokenBalance.value,
+	//           sender: this.app.address,
+	//           assetReceiver: this.adminAddress.value,
+	//           xferAsset: AssetID.fromUint64(this.buyTokenId.value),
+	//           fee: 1000,
+	//         })
+	itxn_begin
+	int axfer
+	itxn_field TypeEnum
+
+	// contracts/DCA.algo.ts:232
+	// assetAmount: this.buyTokenBalance.value
+	byte 0x627579546f6b656e42616c616e6365 // "buyTokenBalance"
+	app_global_get
+	itxn_field AssetAmount
+
+	// contracts/DCA.algo.ts:233
+	// sender: this.app.address
+	global CurrentApplicationAddress
+	itxn_field Sender
+
+	// contracts/DCA.algo.ts:234
+	// assetReceiver: this.adminAddress.value
+	byte 0x61646d696e41646472657373 // "adminAddress"
+	app_global_get
+	itxn_field AssetReceiver
+
+	// contracts/DCA.algo.ts:235
+	// xferAsset: AssetID.fromUint64(this.buyTokenId.value)
+	byte 0x627579546f6b656e4964 // "buyTokenId"
+	app_global_get
+	itxn_field XferAsset
+
+	// contracts/DCA.algo.ts:236
+	// fee: 1000
+	int 1000
+	itxn_field Fee
+
+	// Submit inner transaction
+	itxn_submit
+
+*if9_end:
+
+*if8_end:
+	retsub
+
 *create_NoOp:
-	method "createApplication(address,address,uint64,uint64,uint64,uint64,uint64,uint64)void"
+	method "createApplication(address,address,uint64,uint64,uint64,uint64)void"
 	txna ApplicationArgs 0
 	match *abi_route_createApplication
 
@@ -619,12 +1326,24 @@ removeFunds:
 	err
 
 *call_NoOp:
-	method "fundAlgo(pay,uint64)void"
 	method "updateParams(uint64,uint64,uint64,uint64)void"
-	method "claimBuyTokens()void"
+	method "fundAlgo(pay,uint64)void"
+	method "fundAsset(axfer,uint64)void"
 	method "removeFunds(uint64)void"
+	method "claimBuyTokens()void"
+	method "transferFundsForSwap(uint64)void"
+	method "receiveBoughtTokensAlgo(pay,uint64)void"
+	method "receiveBoughtTokensAsset(axfer,uint64)void"
 	txna ApplicationArgs 0
-	match *abi_route_fundAlgo *abi_route_updateParams *abi_route_claimBuyTokens *abi_route_removeFunds
+	match *abi_route_updateParams *abi_route_fundAlgo *abi_route_fundAsset *abi_route_removeFunds *abi_route_claimBuyTokens *abi_route_transferFundsForSwap *abi_route_receiveBoughtTokensAlgo *abi_route_receiveBoughtTokensAsset
 
 	// this contract does not implement the given ABI method for call NoOp
+	err
+
+*call_DeleteApplication:
+	method "deleteApplication()void"
+	txna ApplicationArgs 0
+	match *abi_route_deleteApplication
+
+	// this contract does not implement the given ABI method for call DeleteApplication
 	err
