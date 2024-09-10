@@ -11,6 +11,8 @@ export class Fund extends Contract {
 
     userAddress = GlobalStateKey<Address>();
 
+    mbr = GlobalStateKey<uint64>();
+
     //
     //Create application
     //
@@ -25,9 +27,24 @@ export class Fund extends Contract {
         assert(this.txn.sender === this.userAddress.value, "Only user can delete application");
     }
 
+    addMBR(payTxn: PayTxn, quantity: uint64): void {
+        assert(this.txn.sender == this.userAddress.value, "Only user can add MBR");
+
+        verifyPayTxn(payTxn, {
+            sender: this.userAddress.value,
+            receiver: this.app.address,
+            amount: quantity,
+        });
+        this.currentBalance.value += payTxn.amount;
+        this.mbr.value += payTxn.amount
+        this.lastUpdated.value = globals.latestTimestamp;
+    }
+
     // Add algo funds to the contract
     addFunds(payTxn: PayTxn, quantity: uint64): void {
         assert(this.txn.sender == this.userAddress.value, "Only user can fund");
+        assert(payTxn.amount > 0, "Amount must be greater than 0");
+        assert(quantity > 0, "Quantity must be greater than 0");
 
         verifyPayTxn(payTxn, {
             sender: this.userAddress.value,
@@ -41,9 +58,11 @@ export class Fund extends Contract {
     // Remove funds from the contract
     removeFunds(quantity: uint64): void {
         assert(this.txn.sender == this.userAddress.value, "Only user can remove funds");
+        assert(this.currentBalance.value >= quantity, "Insufficient funds");
+        
         let amount = quantity;
         if (amount === 0) {
-            amount = this.currentBalance.value - 1000;
+            amount = this.currentBalance.value - this.mbr.value;
         }
         sendPayment(
             {
@@ -59,9 +78,11 @@ export class Fund extends Contract {
     // Send funds to nominated address
     sendFunds(quantity: uint64, sendToAddress: Address): void {
         assert(this.txn.sender == this.orchestratorAddress.value, "Only orchestrator can send funds to nominated accounts");
+        assert(this.currentBalance.value >= quantity, "Insufficient funds");
+
         let amount = quantity;
         if (amount === 0) {
-            amount = this.currentBalance.value;
+            amount = this.currentBalance.value - this.mbr.value;
         }
         sendPayment(
             {

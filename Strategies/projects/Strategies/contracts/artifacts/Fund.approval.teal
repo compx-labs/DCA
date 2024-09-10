@@ -43,25 +43,25 @@ switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEM
 createApplication:
 	proto 1 0
 
-	// contracts/Fund.algo.ts:18
+	// contracts/Fund.algo.ts:20
 	// this.userAddress.value = this.txn.sender
 	byte 0x7573657241646472657373 // "userAddress"
 	txn Sender
 	app_global_put
 
-	// contracts/Fund.algo.ts:19
+	// contracts/Fund.algo.ts:21
 	// this.orchestratorAddress.value = orchestratorAddress
 	byte 0x6f7263686573747261746f7241646472657373 // "orchestratorAddress"
 	frame_dig -1 // orchestratorAddress: Address
 	app_global_put
 
-	// contracts/Fund.algo.ts:20
+	// contracts/Fund.algo.ts:22
 	// this.currentBalance.value = 0
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	int 0
 	app_global_put
 
-	// contracts/Fund.algo.ts:21
+	// contracts/Fund.algo.ts:23
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -79,7 +79,7 @@ createApplication:
 deleteApplication:
 	proto 0 0
 
-	// contracts/Fund.algo.ts:25
+	// contracts/Fund.algo.ts:27
 	// assert(this.txn.sender === this.userAddress.value, "Only user can delete application")
 	txn Sender
 	byte 0x7573657241646472657373 // "userAddress"
@@ -90,8 +90,8 @@ deleteApplication:
 	assert
 	retsub
 
-// addFunds(pay,uint64)void
-*abi_route_addFunds:
+// addMBR(pay,uint64)void
+*abi_route_addMBR:
 	// quantity: uint64
 	txna ApplicationArgs 1
 	btoi
@@ -105,29 +105,29 @@ deleteApplication:
 	int pay
 	==
 
-	// argument 1 (payTxn) for addFunds must be a pay transaction
+	// argument 1 (payTxn) for addMBR must be a pay transaction
 	assert
 
-	// execute addFunds(pay,uint64)void
-	callsub addFunds
+	// execute addMBR(pay,uint64)void
+	callsub addMBR
 	int 1
 	return
 
-// addFunds(payTxn: PayTxn, quantity: uint64): void
-addFunds:
+// addMBR(payTxn: PayTxn, quantity: uint64): void
+addMBR:
 	proto 2 0
 
-	// contracts/Fund.algo.ts:30
-	// assert(this.txn.sender == this.userAddress.value, "Only user can fund")
+	// contracts/Fund.algo.ts:31
+	// assert(this.txn.sender == this.userAddress.value, "Only user can add MBR")
 	txn Sender
 	byte 0x7573657241646472657373 // "userAddress"
 	app_global_get
 	==
 
-	// Only user can fund
+	// Only user can add MBR
 	assert
 
-	// contracts/Fund.algo.ts:32
+	// contracts/Fund.algo.ts:33
 	// verifyPayTxn(payTxn, {
 	//             sender: this.userAddress.value,
 	//             receiver: this.app.address,
@@ -161,7 +161,7 @@ addFunds:
 	// transaction verification failed: {"txn":"payTxn","field":"amount","expected":"quantity"}
 	assert
 
-	// contracts/Fund.algo.ts:37
+	// contracts/Fund.algo.ts:38
 	// this.currentBalance.value += payTxn.amount
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	app_global_get
@@ -172,7 +172,126 @@ addFunds:
 	swap
 	app_global_put
 
-	// contracts/Fund.algo.ts:38
+	// contracts/Fund.algo.ts:39
+	// this.mbr.value += payTxn.amount
+	byte 0x6d6272 // "mbr"
+	app_global_get
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Amount
+	+
+	byte 0x6d6272 // "mbr"
+	swap
+	app_global_put
+
+	// contracts/Fund.algo.ts:40
+	// this.lastUpdated.value = globals.latestTimestamp
+	byte 0x6c61737455706461746564 // "lastUpdated"
+	global LatestTimestamp
+	app_global_put
+	retsub
+
+// addFunds(pay,uint64)void
+*abi_route_addFunds:
+	// quantity: uint64
+	txna ApplicationArgs 1
+	btoi
+
+	// payTxn: pay
+	txn GroupIndex
+	int 1
+	-
+	dup
+	gtxns TypeEnum
+	int pay
+	==
+
+	// argument 1 (payTxn) for addFunds must be a pay transaction
+	assert
+
+	// execute addFunds(pay,uint64)void
+	callsub addFunds
+	int 1
+	return
+
+// addFunds(payTxn: PayTxn, quantity: uint64): void
+addFunds:
+	proto 2 0
+
+	// contracts/Fund.algo.ts:45
+	// assert(this.txn.sender == this.userAddress.value, "Only user can fund")
+	txn Sender
+	byte 0x7573657241646472657373 // "userAddress"
+	app_global_get
+	==
+
+	// Only user can fund
+	assert
+
+	// contracts/Fund.algo.ts:46
+	// assert(payTxn.amount > 0, "Amount must be greater than 0")
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Amount
+	int 0
+	>
+
+	// Amount must be greater than 0
+	assert
+
+	// contracts/Fund.algo.ts:47
+	// assert(quantity > 0, "Quantity must be greater than 0")
+	frame_dig -2 // quantity: uint64
+	int 0
+	>
+
+	// Quantity must be greater than 0
+	assert
+
+	// contracts/Fund.algo.ts:49
+	// verifyPayTxn(payTxn, {
+	//             sender: this.userAddress.value,
+	//             receiver: this.app.address,
+	//             amount: quantity,
+	//         })
+	// verify sender
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Sender
+	byte 0x7573657241646472657373 // "userAddress"
+	app_global_get
+	==
+
+	// transaction verification failed: {"txn":"payTxn","field":"sender","expected":"this.userAddress.value"}
+	assert
+
+	// verify receiver
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Receiver
+	global CurrentApplicationAddress
+	==
+
+	// transaction verification failed: {"txn":"payTxn","field":"receiver","expected":"this.app.address"}
+	assert
+
+	// verify amount
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Amount
+	frame_dig -2 // quantity: uint64
+	==
+
+	// transaction verification failed: {"txn":"payTxn","field":"amount","expected":"quantity"}
+	assert
+
+	// contracts/Fund.algo.ts:54
+	// this.currentBalance.value += payTxn.amount
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	frame_dig -1 // payTxn: PayTxn
+	gtxns Amount
+	+
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	swap
+	app_global_put
+
+	// contracts/Fund.algo.ts:55
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -197,7 +316,7 @@ removeFunds:
 	// Push empty bytes after the frame pointer to reserve space for local variables
 	byte 0x
 
-	// contracts/Fund.algo.ts:43
+	// contracts/Fund.algo.ts:60
 	// assert(this.txn.sender == this.userAddress.value, "Only user can remove funds")
 	txn Sender
 	byte 0x7573657241646472657373 // "userAddress"
@@ -207,13 +326,23 @@ removeFunds:
 	// Only user can remove funds
 	assert
 
-	// contracts/Fund.algo.ts:44
+	// contracts/Fund.algo.ts:61
+	// assert(this.currentBalance.value >= quantity, "Insufficient funds")
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	frame_dig -1 // quantity: uint64
+	>=
+
+	// Insufficient funds
+	assert
+
+	// contracts/Fund.algo.ts:63
 	// amount = quantity
 	frame_dig -1 // quantity: uint64
 	frame_bury 0 // amount: uint64
 
 	// *if0_condition
-	// contracts/Fund.algo.ts:45
+	// contracts/Fund.algo.ts:64
 	// amount === 0
 	frame_dig 0 // amount: uint64
 	int 0
@@ -221,16 +350,17 @@ removeFunds:
 	bz *if0_end
 
 	// *if0_consequent
-	// contracts/Fund.algo.ts:46
-	// amount = this.currentBalance.value - 1000
+	// contracts/Fund.algo.ts:65
+	// amount = this.currentBalance.value - this.mbr.value
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	app_global_get
-	int 1000
+	byte 0x6d6272 // "mbr"
+	app_global_get
 	-
 	frame_bury 0 // amount: uint64
 
 *if0_end:
-	// contracts/Fund.algo.ts:48
+	// contracts/Fund.algo.ts:67
 	// sendPayment(
 	//             {
 	//                 amount: amount,
@@ -242,18 +372,18 @@ removeFunds:
 	int pay
 	itxn_field TypeEnum
 
-	// contracts/Fund.algo.ts:50
+	// contracts/Fund.algo.ts:69
 	// amount: amount
 	frame_dig 0 // amount: uint64
 	itxn_field Amount
 
-	// contracts/Fund.algo.ts:51
+	// contracts/Fund.algo.ts:70
 	// receiver: this.userAddress.value
 	byte 0x7573657241646472657373 // "userAddress"
 	app_global_get
 	itxn_field Receiver
 
-	// contracts/Fund.algo.ts:52
+	// contracts/Fund.algo.ts:71
 	// fee: 1000
 	int 1000
 	itxn_field Fee
@@ -261,7 +391,7 @@ removeFunds:
 	// Submit inner transaction
 	itxn_submit
 
-	// contracts/Fund.algo.ts:55
+	// contracts/Fund.algo.ts:74
 	// this.currentBalance.value -= amount
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	app_global_get
@@ -271,7 +401,7 @@ removeFunds:
 	swap
 	app_global_put
 
-	// contracts/Fund.algo.ts:56
+	// contracts/Fund.algo.ts:75
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -306,7 +436,7 @@ sendFunds:
 	// Push empty bytes after the frame pointer to reserve space for local variables
 	byte 0x
 
-	// contracts/Fund.algo.ts:61
+	// contracts/Fund.algo.ts:80
 	// assert(this.txn.sender == this.orchestratorAddress.value, "Only orchestrator can send funds to nominated accounts")
 	txn Sender
 	byte 0x6f7263686573747261746f7241646472657373 // "orchestratorAddress"
@@ -316,13 +446,23 @@ sendFunds:
 	// Only orchestrator can send funds to nominated accounts
 	assert
 
-	// contracts/Fund.algo.ts:62
+	// contracts/Fund.algo.ts:81
+	// assert(this.currentBalance.value >= quantity, "Insufficient funds")
+	byte 0x63757272656e7442616c616e6365 // "currentBalance"
+	app_global_get
+	frame_dig -1 // quantity: uint64
+	>=
+
+	// Insufficient funds
+	assert
+
+	// contracts/Fund.algo.ts:83
 	// amount = quantity
 	frame_dig -1 // quantity: uint64
 	frame_bury 0 // amount: uint64
 
 	// *if1_condition
-	// contracts/Fund.algo.ts:63
+	// contracts/Fund.algo.ts:84
 	// amount === 0
 	frame_dig 0 // amount: uint64
 	int 0
@@ -330,14 +470,17 @@ sendFunds:
 	bz *if1_end
 
 	// *if1_consequent
-	// contracts/Fund.algo.ts:64
-	// amount = this.currentBalance.value
+	// contracts/Fund.algo.ts:85
+	// amount = this.currentBalance.value - this.mbr.value
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	app_global_get
+	byte 0x6d6272 // "mbr"
+	app_global_get
+	-
 	frame_bury 0 // amount: uint64
 
 *if1_end:
-	// contracts/Fund.algo.ts:66
+	// contracts/Fund.algo.ts:87
 	// sendPayment(
 	//             {
 	//                 amount: amount,
@@ -349,17 +492,17 @@ sendFunds:
 	int pay
 	itxn_field TypeEnum
 
-	// contracts/Fund.algo.ts:68
+	// contracts/Fund.algo.ts:89
 	// amount: amount
 	frame_dig 0 // amount: uint64
 	itxn_field Amount
 
-	// contracts/Fund.algo.ts:69
+	// contracts/Fund.algo.ts:90
 	// receiver: sendToAddress
 	frame_dig -2 // sendToAddress: Address
 	itxn_field Receiver
 
-	// contracts/Fund.algo.ts:70
+	// contracts/Fund.algo.ts:91
 	// fee: 1000
 	int 1000
 	itxn_field Fee
@@ -367,7 +510,7 @@ sendFunds:
 	// Submit inner transaction
 	itxn_submit
 
-	// contracts/Fund.algo.ts:73
+	// contracts/Fund.algo.ts:94
 	// this.currentBalance.value -= amount
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	app_global_get
@@ -377,7 +520,7 @@ sendFunds:
 	swap
 	app_global_put
 
-	// contracts/Fund.algo.ts:74
+	// contracts/Fund.algo.ts:95
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -393,11 +536,12 @@ sendFunds:
 	err
 
 *call_NoOp:
+	method "addMBR(pay,uint64)void"
 	method "addFunds(pay,uint64)void"
 	method "removeFunds(uint64)void"
 	method "sendFunds(uint64,address)void"
 	txna ApplicationArgs 0
-	match *abi_route_addFunds *abi_route_removeFunds *abi_route_sendFunds
+	match *abi_route_addMBR *abi_route_addFunds *abi_route_removeFunds *abi_route_sendFunds
 
 	// this contract does not implement the given ABI method for call NoOp
 	err

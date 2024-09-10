@@ -22,6 +22,22 @@
       }
     },
     {
+      "name": "addMBR",
+      "args": [
+        {
+          "name": "payTxn",
+          "type": "pay"
+        },
+        {
+          "name": "quantity",
+          "type": "uint64"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
       "name": "addFunds",
       "args": [
         {
