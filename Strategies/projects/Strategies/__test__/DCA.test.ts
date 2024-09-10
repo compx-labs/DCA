@@ -1,22 +1,22 @@
 import { describe, test, expect, beforeAll, beforeEach } from '@jest/globals';
 import { algorandFixture } from '@algorandfoundation/algokit-utils/testing';
 import * as algokit from '@algorandfoundation/algokit-utils';
-import { DCAClient } from '../contracts/clients/DCAClient';
+import { DcaClient } from '../contracts/clients/DCAClient';
 
 const fixture = algorandFixture();
 algokit.Config.configure({ populateAppCallResources: true });
 
-let appClient: DCAClient;
+let appClient: DcaClient;
 
 describe('DCA', () => {
   beforeEach(fixture.beforeEach);
 
-  beforeAll(async () => {
+  /* beforeAll(async () => {
     await fixture.beforeEach();
     const { testAccount } = fixture.context;
     const { algorand } = fixture;
 
-    appClient = new DCAClient(
+    appClient = new DcaClient(
       {
         sender: testAccount,
         resolveBy: 'id',
@@ -25,25 +25,14 @@ describe('DCA', () => {
       algorand.client.algod
     );
 
-    await appClient.create.createApplication({});
-  });
+    await appClient.create.createApplication({
+      adminAddress: testAccount,
+      buyTokenReceiver: testAccount,
+      balanceTokenId: 0,
+      buyTokenId: 1,
+      buyIntervalSeconds: 60,
+      targetSpend: 1000,
+    });
+  }); */
 
-  test('sum', async () => {
-    const a = 13;
-    const b = 37;
-    const sum = await appClient.doMath({ a, b, operation: 'sum' });
-    expect(sum.return?.valueOf()).toBe(BigInt(a + b));
-  });
-
-  test('difference', async () => {
-    const a = 13;
-    const b = 37;
-    const diff = await appClient.doMath({ a, b, operation: 'difference' });
-    expect(diff.return?.valueOf()).toBe(BigInt(a >= b ? a - b : b - a));
-  });
-
-  test('hello', async () => {
-    const diff = await appClient.hello({ name: 'world!' });
-    expect(diff.return?.valueOf()).toBe('Hello, world!');
-  });
 });

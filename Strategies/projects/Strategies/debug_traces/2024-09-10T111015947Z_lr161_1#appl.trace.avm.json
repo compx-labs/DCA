@@ -1,0 +1,249 @@
+{
+  "last-round": 161,
+  "txn-groups": [
+    {
+      "txn-results": [
+        {
+          "txn-result": {
+            "pool-error": "",
+            "txn": {
+              "txn": {
+                "apaa": [
+                  "M6r6cg==",
+                  "AAAAAAAtxsA="
+                ],
+                "apid": 1189,
+                "fee": 1000,
+                "fv": 161,
+                "gen": "dockernet-v1",
+                "gh": "P5ROzccBfEztXKocnXIb1bPy9Nt2VuX1MairW9HjKWM=",
+                "lv": 1161,
+                "snd": "LS9h3NeRT6/ObcLP+5Z3S+tImi2sHO5tI58geh18iSM=",
+                "type": "appl"
+              }
+            }
+          },
+          "app-budget-consumed": 24,
+          "exec-trace": {
+            "approval-program-hash": "83XMcrzBffkw6SrncVdgN8y/nh7ag6EeMBntYlUnn1k=",
+            "approval-program-trace": [
+              {
+                "pc": 1
+              },
+              {
+                "pc": 8
+              },
+              {
+                "pc": 70,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 1189
+                  }
+                ]
+              },
+              {
+                "pc": 72,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 73,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 6
+                  }
+                ]
+              },
+              {
+                "pc": 75,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 2
+              },
+              {
+                "pc": 76,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ]
+              },
+              {
+                "pc": 78,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 2
+              },
+              {
+                "pc": 79,
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 372,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "uGMEOw=="
+                  }
+                ]
+              },
+              {
+                "pc": 378,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "M6r6cg=="
+                  }
+                ]
+              },
+              {
+                "pc": 384,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "rIK8sQ=="
+                  }
+                ]
+              },
+              {
+                "pc": 390,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "M6r6cg=="
+                  }
+                ]
+              },
+              {
+                "pc": 393,
+                "stack-pop-count": 4
+              },
+              {
+                "pc": 220,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "AAAAAAAtxsA="
+                  }
+                ]
+              },
+              {
+                "pc": 223,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 3000000
+                  }
+                ],
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 224
+              },
+              {
+                "pc": 229
+              },
+              {
+                "pc": 232,
+                "stack-additions": [
+                  {
+                    "type": 1
+                  }
+                ]
+              },
+              {
+                "pc": 234,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "LS9h3NeRT6/ObcLP+5Z3S+tImi2sHO5tI58geh18iSM="
+                  }
+                ]
+              },
+              {
+                "pc": 236,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "dXNlckFkZHJlc3M="
+                  }
+                ]
+              },
+              {
+                "pc": 237,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "HSyBOC4jNuXBjHq5LZjIkvZJlDx3SJq5tm4x9ThYbt8="
+                  }
+                ],
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 238,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 2
+              },
+              {
+                "pc": 239,
+                "stack-pop-count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "app-budget-added": 700,
+      "app-budget-consumed": 24,
+      "failed-at": [
+        0
+      ],
+      "failure-message": "transaction 75SF3XSBJ7JEZ3MEKXTQZZOJQGVGGYGLVBMYU7S5KYEVNWFWSWBQ: logic eval error: assert failed pc=239. Details: app=1189, pc=239, opcodes=app_global_get; ==; assert"
+    }
+  ],
+  "version": 2,
+  "eval-overrides": {
+    "allow-empty-signatures": true,
+    "max-log-calls": 2048,
+    "max-log-size": 65536
+  },
+  "exec-trace-config": {
+    "enable": true,
+    "scratch-change": true,
+    "stack-change": true,
+    "state-change": true
+  },
+  "initial-states": {
+    "app-initial-states": [
+      {
+        "id": 1189,
+        "app-globals": {
+          "kvs": [
+            {
+              "key": "dXNlckFkZHJlc3M=",
+              "value": {
+                "type": 1,
+                "bytes": "HSyBOC4jNuXBjHq5LZjIkvZJlDx3SJq5tm4x9ThYbt8="
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

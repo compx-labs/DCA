@@ -48,10 +48,6 @@
         {
           "name": "_targetBuy",
           "type": "uint64"
-        },
-        {
-          "name": "_endTime",
-          "type": "uint64"
         }
       ],
       "returns": {

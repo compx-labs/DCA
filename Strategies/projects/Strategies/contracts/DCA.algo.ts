@@ -51,19 +51,15 @@ export class DCA extends Contract {
 
   }
 
-
-
   updateParams(
     _buyIntervalSeconds: uint64,
     _targetSpend: uint64,
     _targetBuy: uint64,
-    _endTime: uint64,
   ): void {
     assert(this.txn.sender == this.adminAddress.value, "Only admin can update params");
 
     this.buyIntervalSeconds.value = _buyIntervalSeconds
     this.targetSpend.value = _targetSpend
-
     this.lastUpdated.value = globals.latestTimestamp;
   }
 
