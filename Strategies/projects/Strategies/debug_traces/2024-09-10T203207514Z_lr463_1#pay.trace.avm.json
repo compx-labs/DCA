@@ -1,0 +1,69 @@
+{
+  "last-round": 463,
+  "txn-groups": [
+    {
+      "txn-results": [
+        {
+          "txn-result": {
+            "pool-error": "",
+            "txn": {
+              "txn": {
+                "amt": 10000000,
+                "fee": 1000,
+                "fv": 463,
+                "gen": "dockernet-v1",
+                "gh": "P5ROzccBfEztXKocnXIb1bPy9Nt2VuX1MairW9HjKWM=",
+                "grp": "C8zvuooE3AeonuHzUu7DVHD41rArzDx9mAJfyKW8Il0=",
+                "lv": 1463,
+                "note": "QWRkIGZ1bmRz",
+                "rcv": "W5EbPlvw090HaM7lf9A6RlRXk6ALy7psq82CAQnEf8Q=",
+                "snd": "yryW5bMWOV1vJgrUMmuFUlVRbJtZ8pQjLWi5wWF1yjQ=",
+                "type": "pay"
+              }
+            }
+          }
+        },
+        {
+          "txn-result": {
+            "pool-error": "",
+            "txn": {
+              "txn": {
+                "apaa": [
+                  "uGMEOw==",
+                  "AAAAAACYloA="
+                ],
+                "apid": 1559,
+                "fee": 1000,
+                "fv": 463,
+                "gen": "dockernet-v1",
+                "gh": "P5ROzccBfEztXKocnXIb1bPy9Nt2VuX1MairW9HjKWM=",
+                "grp": "C8zvuooE3AeonuHzUu7DVHD41rArzDx9mAJfyKW8Il0=",
+                "lv": 1463,
+                "snd": "yryW5bMWOV1vJgrUMmuFUlVRbJtZ8pQjLWi5wWF1yjQ=",
+                "type": "appl"
+              }
+            }
+          }
+        }
+      ],
+      "app-budget-added": 700,
+      "failed-at": [
+        0
+      ],
+      "failure-message": "transaction KDD7JLPZDSXRU2563LE36S6AZGTA2QLQNV3V4644SJPCN6PKAVAQ: overspend (account ZK6JNZNTCY4V23ZGBLKDE24FKJKVC3E3LHZJIIZNNC44CYLVZI2LGVO6HI, data {AccountBaseData:{Status:Offline MicroAlgos:{Raw:9999000} RewardsBase:0 RewardedMicroAlgos:{Raw:0} AuthAddr:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ IncentiveEligible:false TotalAppSchema:{_struct:{} NumUint:0 NumByteSlice:0} TotalExtraAppPages:0 TotalAppParams:0 TotalAppLocalStates:0 TotalAssetParams:0 TotalAssets:0 TotalBoxes:0 TotalBoxBytes:0 LastProposed:0 LastHeartbeat:0} VotingData:{VoteID:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] SelectionID:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] StateProofID:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] VoteFirstValid:0 VoteLastValid:0 VoteKeyDilution:0}}, tried to spend {10000000})"
+    }
+  ],
+  "version": 2,
+  "eval-overrides": {
+    "allow-empty-signatures": true,
+    "max-log-calls": 2048,
+    "max-log-size": 65536
+  },
+  "exec-trace-config": {
+    "enable": true,
+    "scratch-change": true,
+    "stack-change": true,
+    "state-change": true
+  },
+  "initial-states": {}
+}

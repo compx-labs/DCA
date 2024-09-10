@@ -1,0 +1,343 @@
+{
+  "last-round": 459,
+  "txn-groups": [
+    {
+      "txn-results": [
+        {
+          "txn-result": {
+            "pool-error": "",
+            "txn": {
+              "txn": {
+                "amt": 2000000,
+                "fee": 1000,
+                "fv": 451,
+                "gen": "dockernet-v1",
+                "gh": "P5ROzccBfEztXKocnXIb1bPy9Nt2VuX1MairW9HjKWM=",
+                "grp": "VsjEfSq22v09uqeMX0xWMCUnN/fNLsP4pyEZuAfQ6Xc=",
+                "lv": 1451,
+                "note": "QWRkIE1CUg==",
+                "rcv": "W5EbPlvw090HaM7lf9A6RlRXk6ALy7psq82CAQnEf8Q=",
+                "snd": "Yb1Jyoky66V9RCIykEjpYmyzHHVHS1tSJZLebGqrA1k=",
+                "type": "pay"
+              }
+            }
+          }
+        },
+        {
+          "txn-result": {
+            "pool-error": "",
+            "txn": {
+              "txn": {
+                "apaa": [
+                  "HHD+nQ==",
+                  "AAAAAAAehIA="
+                ],
+                "apid": 1559,
+                "fee": 1000,
+                "fv": 459,
+                "gen": "dockernet-v1",
+                "gh": "P5ROzccBfEztXKocnXIb1bPy9Nt2VuX1MairW9HjKWM=",
+                "grp": "VsjEfSq22v09uqeMX0xWMCUnN/fNLsP4pyEZuAfQ6Xc=",
+                "lv": 1459,
+                "snd": "Yb1Jyoky66V9RCIykEjpYmyzHHVHS1tSJZLebGqrA1k=",
+                "type": "appl"
+              }
+            }
+          },
+          "app-budget-consumed": 32,
+          "exec-trace": {
+            "approval-program-hash": "8DuMlHTbnMyE6qUtk0S6B46jxsPp1dvIc+5+LSyYIAk=",
+            "approval-program-trace": [
+              {
+                "pc": 1
+              },
+              {
+                "pc": 8
+              },
+              {
+                "pc": 74,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 1559
+                  }
+                ]
+              },
+              {
+                "pc": 76,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 77,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 6
+                  }
+                ]
+              },
+              {
+                "pc": 79,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 2
+              },
+              {
+                "pc": 80,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ]
+              },
+              {
+                "pc": 82,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 2
+              },
+              {
+                "pc": 83,
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 483,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "HHD+nQ=="
+                  }
+                ]
+              },
+              {
+                "pc": 489,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "uGMEOw=="
+                  }
+                ]
+              },
+              {
+                "pc": 495,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "M6r6cg=="
+                  }
+                ]
+              },
+              {
+                "pc": 501,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "rIK8sQ=="
+                  }
+                ]
+              },
+              {
+                "pc": 507,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "HHD+nQ=="
+                  }
+                ]
+              },
+              {
+                "pc": 510,
+                "stack-pop-count": 5
+              },
+              {
+                "pc": 158,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "AAAAAAAehIA="
+                  }
+                ]
+              },
+              {
+                "pc": 161,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 2000000
+                  }
+                ],
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 162,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 1
+                  }
+                ]
+              },
+              {
+                "pc": 164,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 1
+                  }
+                ]
+              },
+              {
+                "pc": 165,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 2
+              },
+              {
+                "pc": 166,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  },
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 167,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 1
+                  }
+                ],
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 169,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 1
+                  }
+                ]
+              },
+              {
+                "pc": 170,
+                "stack-additions": [
+                  {
+                    "type": 2,
+                    "uint": 1
+                  }
+                ],
+                "stack-pop-count": 2
+              },
+              {
+                "pc": 171,
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 172
+              },
+              {
+                "pc": 177
+              },
+              {
+                "pc": 180,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "Yb1Jyoky66V9RCIykEjpYmyzHHVHS1tSJZLebGqrA1k="
+                  }
+                ]
+              },
+              {
+                "pc": 182,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "dXNlckFkZHJlc3M="
+                  }
+                ]
+              },
+              {
+                "pc": 183,
+                "stack-additions": [
+                  {
+                    "type": 1,
+                    "bytes": "BOPfDAV3vXPgJIqMq6+Wx2BSvvDPexuxFbGVDhrgDjM="
+                  }
+                ],
+                "stack-pop-count": 1
+              },
+              {
+                "pc": 184,
+                "stack-additions": [
+                  {
+                    "type": 2
+                  }
+                ],
+                "stack-pop-count": 2
+              },
+              {
+                "pc": 185,
+                "stack-pop-count": 1
+              }
+            ]
+          }
+        }
+      ],
+      "app-budget-added": 700,
+      "app-budget-consumed": 32,
+      "failed-at": [
+        1
+      ],
+      "failure-message": "transaction HVT3RSM2BTDS7ZZTG6IYRFCSSLWCBQCD2BM4IFWYH3DH43W4OLWA: logic eval error: assert failed pc=185. Details: app=1559, pc=185, opcodes=app_global_get; ==; assert"
+    }
+  ],
+  "version": 2,
+  "eval-overrides": {
+    "allow-empty-signatures": true,
+    "max-log-calls": 2048,
+    "max-log-size": 65536
+  },
+  "exec-trace-config": {
+    "enable": true,
+    "scratch-change": true,
+    "stack-change": true,
+    "state-change": true
+  },
+  "initial-states": {
+    "app-initial-states": [
+      {
+        "id": 1559,
+        "app-globals": {
+          "kvs": [
+            {
+              "key": "dXNlckFkZHJlc3M=",
+              "value": {
+                "type": 1,
+                "bytes": "BOPfDAV3vXPgJIqMq6+Wx2BSvvDPexuxFbGVDhrgDjM="
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
