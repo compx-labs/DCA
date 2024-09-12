@@ -89,6 +89,7 @@ export class Fund extends Contract {
                 amount: amount,
                 receiver: sendToAddress,
                 fee: 1000,
+                note: "Funding request from " + this.app.id.toString() + " to " + sendToAddress
             }
         )
         this.currentBalance.value -= amount;

@@ -486,6 +486,7 @@ sendFunds:
 	//                 amount: amount,
 	//                 receiver: sendToAddress,
 	//                 fee: 1000,
+	//                 note: "Funding request from " + this.app.id.toString() + " to " + sendToAddress
 	//             }
 	//         )
 	itxn_begin
@@ -507,10 +508,22 @@ sendFunds:
 	int 1000
 	itxn_field Fee
 
+	// contracts/Fund.algo.ts:92
+	// note: "Funding request from " + this.app.id.toString() + " to " + sendToAddress
+	byte 0x46756e64696e6720726571756573742066726f6d20 // "Funding request from "
+	txna Applications 0
+	callsub *itoa
+	concat
+	byte 0x20746f20 // " to "
+	concat
+	frame_dig -2 // sendToAddress: Address
+	concat
+	itxn_field Note
+
 	// Submit inner transaction
 	itxn_submit
 
-	// contracts/Fund.algo.ts:94
+	// contracts/Fund.algo.ts:95
 	// this.currentBalance.value -= amount
 	byte 0x63757272656e7442616c616e6365 // "currentBalance"
 	app_global_get
@@ -520,7 +533,7 @@ sendFunds:
 	swap
 	app_global_put
 
-	// contracts/Fund.algo.ts:95
+	// contracts/Fund.algo.ts:96
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -553,3 +566,45 @@ sendFunds:
 
 	// this contract does not implement the given ABI method for call DeleteApplication
 	err
+
+*intToAscii:
+	proto 1 1
+	byte 0x30313233343536373839 // "0123456789"
+	frame_dig -1 // i: uint64
+	int 1
+	extract3
+	retsub
+	
+
+*itoa:
+	proto 1 1
+	frame_dig -1 // i: uint64
+	int 0
+	==
+	bz *itoa_if_end
+	byte 0x30
+	retsub
+
+*itoa_if_end:
+	frame_dig -1 // i: uint64
+	int 10
+	/
+	int 0
+	>
+	bz *itoa_ternary_false
+	frame_dig -1 // i: uint64
+	int 10
+	/
+	callsub *itoa
+	b *itoa_ternary_end
+
+*itoa_ternary_false:
+	byte 0x // ""
+
+*itoa_ternary_end:
+	frame_dig -1 // i: uint64
+	int 10
+	%
+	callsub *intToAscii
+	concat
+	retsub
