@@ -35,6 +35,17 @@ export class DCA extends Contract {
     assert(this.txn.sender === this.userAddress.value, "Only user can delete application");
   }
 
+  optInToAsset(asset: AssetID): void {
+    assert(this.txn.sender === this.userAddress.value, "Only user can opt contract into asset");
+
+    sendAssetTransfer({
+      xferAsset: asset,
+      assetAmount: 0,
+      assetReceiver: this.app.address,
+      sender: this.app.address,
+    });
+  }
+
   addMBR(payTxn: PayTxn, quantity: uint64): void {
     assert(this.txn.sender == this.userAddress.value, "Only user can add MBR");
 
@@ -88,7 +99,7 @@ export class DCA extends Contract {
       assetReceiver: this.app.address,
       assetAmount: quantity,
       xferAsset: AssetID.fromUint64(this.SwapToTokenId.value),
-      note: axferTxn.sender + ", " + axferTxn.xferAsset.id.toString() + ", " + axferTxn.assetAmount.toString(),
+      note: axferTxn.xferAsset.id.toString() + ", " + axferTxn.assetAmount.toString(),
     });
 
     this.swappedTokenBalance.value += axferTxn.assetAmount;
