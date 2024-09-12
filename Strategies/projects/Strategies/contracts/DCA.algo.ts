@@ -80,6 +80,7 @@ export class DCA extends Contract {
     assert(this.app.address.balance > 0, "Insufficient balance");
     assert(this.swapAmount.value > 0, "Swap amount not set");
     assert(this.SwapToTokenId.value > 0, "Swap token not set");
+    assert(this.mbr.value > 0, "Insufficient MBR");
 
     sendPayment({
       amount: this.swapAmount.value,
@@ -91,7 +92,7 @@ export class DCA extends Contract {
     this.lastUpdated.value = globals.latestTimestamp;
   }
 
-  receiveSwapAndSendOn(axferTxn: AssetTransferTxn, quantity: uint64): void {
+  receiveSwap(axferTxn: AssetTransferTxn, quantity: uint64): void {
     assert(this.txn.sender == this.swapManagerAccount.value, "Only swap manager can send swap tokens");
 
     verifyAssetTransferTxn(axferTxn, {
@@ -109,6 +110,7 @@ export class DCA extends Contract {
   sendSwappedTokens(sendToAddress: Address): void {
     assert(this.txn.sender == this.orchestratorAddress.value, "Only orchestrator can send swapped tokens to nominated accounts");
     assert(this.swappedTokenBalance.value > 0, "Insufficient swapped tokens");
+    assert(this.mbr.value > 0, "Insufficient MBR");
 
     sendAssetTransfer({
       sender: this.app.address,

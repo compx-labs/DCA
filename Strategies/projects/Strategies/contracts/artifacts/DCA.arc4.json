@@ -93,7 +93,7 @@
       }
     },
     {
-      "name": "receiveSwapAndSendOn",
+      "name": "receiveSwap",
       "args": [
         {
           "name": "axferTxn",

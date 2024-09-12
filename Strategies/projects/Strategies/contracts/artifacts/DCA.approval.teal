@@ -425,7 +425,17 @@ initiateSwap:
 	// Swap token not set
 	assert
 
-	// contracts/DCA.algo.ts:84
+	// contracts/DCA.algo.ts:83
+	// assert(this.mbr.value > 0, "Insufficient MBR")
+	byte 0x6d6272 // "mbr"
+	app_global_get
+	int 0
+	>
+
+	// Insufficient MBR
+	assert
+
+	// contracts/DCA.algo.ts:85
 	// sendPayment({
 	//       amount: this.swapAmount.value,
 	//       sender: this.app.address,
@@ -436,24 +446,24 @@ initiateSwap:
 	int pay
 	itxn_field TypeEnum
 
-	// contracts/DCA.algo.ts:85
+	// contracts/DCA.algo.ts:86
 	// amount: this.swapAmount.value
 	byte 0x73776170416d6f756e74 // "swapAmount"
 	app_global_get
 	itxn_field Amount
 
-	// contracts/DCA.algo.ts:86
+	// contracts/DCA.algo.ts:87
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
 
-	// contracts/DCA.algo.ts:87
+	// contracts/DCA.algo.ts:88
 	// receiver: this.swapManagerAccount.value
 	byte 0x737761704d616e616765724163636f756e74 // "swapManagerAccount"
 	app_global_get
 	itxn_field Receiver
 
-	// contracts/DCA.algo.ts:88
+	// contracts/DCA.algo.ts:89
 	// note: "Swap requested: to, amount: " + this.SwapToTokenId.value + ", " + this.swapAmount.value
 	byte 0x53776170207265717565737465643a20746f2c20616d6f756e743a20 // "Swap requested: to, amount: "
 	byte 0x53776170546f546f6b656e4964 // "SwapToTokenId"
@@ -473,15 +483,15 @@ initiateSwap:
 	// Submit inner transaction
 	itxn_submit
 
-	// contracts/DCA.algo.ts:91
+	// contracts/DCA.algo.ts:92
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
 	app_global_put
 	retsub
 
-// receiveSwapAndSendOn(axfer,uint64)void
-*abi_route_receiveSwapAndSendOn:
+// receiveSwap(axfer,uint64)void
+*abi_route_receiveSwap:
 	// quantity: uint64
 	txna ApplicationArgs 1
 	btoi
@@ -495,19 +505,19 @@ initiateSwap:
 	int axfer
 	==
 
-	// argument 1 (axferTxn) for receiveSwapAndSendOn must be a axfer transaction
+	// argument 1 (axferTxn) for receiveSwap must be a axfer transaction
 	assert
 
-	// execute receiveSwapAndSendOn(axfer,uint64)void
-	callsub receiveSwapAndSendOn
+	// execute receiveSwap(axfer,uint64)void
+	callsub receiveSwap
 	int 1
 	return
 
-// receiveSwapAndSendOn(axferTxn: AssetTransferTxn, quantity: uint64): void
-receiveSwapAndSendOn:
+// receiveSwap(axferTxn: AssetTransferTxn, quantity: uint64): void
+receiveSwap:
 	proto 2 0
 
-	// contracts/DCA.algo.ts:95
+	// contracts/DCA.algo.ts:96
 	// assert(this.txn.sender == this.swapManagerAccount.value, "Only swap manager can send swap tokens")
 	txn Sender
 	byte 0x737761704d616e616765724163636f756e74 // "swapManagerAccount"
@@ -517,7 +527,7 @@ receiveSwapAndSendOn:
 	// Only swap manager can send swap tokens
 	assert
 
-	// contracts/DCA.algo.ts:97
+	// contracts/DCA.algo.ts:98
 	// verifyAssetTransferTxn(axferTxn, {
 	//       sender: this.swapManagerAccount.value,
 	//       assetReceiver: this.app.address,
@@ -580,7 +590,7 @@ receiveSwapAndSendOn:
 	// transaction verification failed: {"txn":"axferTxn","field":"note","expected":"axferTxn.xferAsset.id.toString() + \", \" + axferTxn.assetAmount.toString()"}
 	assert
 
-	// contracts/DCA.algo.ts:105
+	// contracts/DCA.algo.ts:106
 	// this.swappedTokenBalance.value += axferTxn.assetAmount
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	app_global_get
@@ -591,7 +601,7 @@ receiveSwapAndSendOn:
 	swap
 	app_global_put
 
-	// contracts/DCA.algo.ts:106
+	// contracts/DCA.algo.ts:107
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -619,7 +629,7 @@ receiveSwapAndSendOn:
 sendSwappedTokens:
 	proto 1 0
 
-	// contracts/DCA.algo.ts:110
+	// contracts/DCA.algo.ts:111
 	// assert(this.txn.sender == this.orchestratorAddress.value, "Only orchestrator can send swapped tokens to nominated accounts")
 	txn Sender
 	byte 0x6f7263686573747261746f7241646472657373 // "orchestratorAddress"
@@ -629,7 +639,7 @@ sendSwappedTokens:
 	// Only orchestrator can send swapped tokens to nominated accounts
 	assert
 
-	// contracts/DCA.algo.ts:111
+	// contracts/DCA.algo.ts:112
 	// assert(this.swappedTokenBalance.value > 0, "Insufficient swapped tokens")
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	app_global_get
@@ -640,6 +650,16 @@ sendSwappedTokens:
 	assert
 
 	// contracts/DCA.algo.ts:113
+	// assert(this.mbr.value > 0, "Insufficient MBR")
+	byte 0x6d6272 // "mbr"
+	app_global_get
+	int 0
+	>
+
+	// Insufficient MBR
+	assert
+
+	// contracts/DCA.algo.ts:115
 	// sendAssetTransfer({
 	//       sender: this.app.address,
 	//       assetReceiver: sendToAddress,
@@ -651,29 +671,29 @@ sendSwappedTokens:
 	int axfer
 	itxn_field TypeEnum
 
-	// contracts/DCA.algo.ts:114
+	// contracts/DCA.algo.ts:116
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
 
-	// contracts/DCA.algo.ts:115
+	// contracts/DCA.algo.ts:117
 	// assetReceiver: sendToAddress
 	frame_dig -1 // sendToAddress: Address
 	itxn_field AssetReceiver
 
-	// contracts/DCA.algo.ts:116
+	// contracts/DCA.algo.ts:118
 	// assetAmount: this.swappedTokenBalance.value
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	app_global_get
 	itxn_field AssetAmount
 
-	// contracts/DCA.algo.ts:117
+	// contracts/DCA.algo.ts:119
 	// xferAsset: AssetID.fromUint64(this.SwapToTokenId.value)
 	byte 0x53776170546f546f6b656e4964 // "SwapToTokenId"
 	app_global_get
 	itxn_field XferAsset
 
-	// contracts/DCA.algo.ts:118
+	// contracts/DCA.algo.ts:120
 	// note: "Swapped tokens sent to " + sendToAddress
 	byte 0x5377617070656420746f6b656e732073656e7420746f20 // "Swapped tokens sent to "
 	frame_dig -1 // sendToAddress: Address
@@ -687,13 +707,13 @@ sendSwappedTokens:
 	// Submit inner transaction
 	itxn_submit
 
-	// contracts/DCA.algo.ts:121
+	// contracts/DCA.algo.ts:123
 	// this.swappedTokenBalance.value = 0
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	int 0
 	app_global_put
 
-	// contracts/DCA.algo.ts:122
+	// contracts/DCA.algo.ts:124
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -714,10 +734,10 @@ sendSwappedTokens:
 	method "setSwapParams(uint64,uint64)void"
 	method "updateSwapManagerAccount(address)void"
 	method "initiateSwap()void"
-	method "receiveSwapAndSendOn(axfer,uint64)void"
+	method "receiveSwap(axfer,uint64)void"
 	method "sendSwappedTokens(address)void"
 	txna ApplicationArgs 0
-	match *abi_route_optInToAsset *abi_route_addMBR *abi_route_setSwapParams *abi_route_updateSwapManagerAccount *abi_route_initiateSwap *abi_route_receiveSwapAndSendOn *abi_route_sendSwappedTokens
+	match *abi_route_optInToAsset *abi_route_addMBR *abi_route_setSwapParams *abi_route_updateSwapManagerAccount *abi_route_initiateSwap *abi_route_receiveSwap *abi_route_sendSwappedTokens
 
 	// this contract does not implement the given ABI method for call NoOp
 	err
