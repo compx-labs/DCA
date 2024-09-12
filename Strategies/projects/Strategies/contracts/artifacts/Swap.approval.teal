@@ -57,49 +57,49 @@ switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEM
 createApplication:
 	proto 3 0
 
-	// contracts/DCA.algo.ts:23
+	// contracts/Swap.algo.ts:23
 	// this.swappedTokenBalance.value = 0
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	int 0
 	app_global_put
 
-	// contracts/DCA.algo.ts:24
+	// contracts/Swap.algo.ts:24
 	// this.mbr.value = 0
 	byte 0x6d6272 // "mbr"
 	int 0
 	app_global_put
 
-	// contracts/DCA.algo.ts:25
+	// contracts/Swap.algo.ts:25
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
 	app_global_put
 
-	// contracts/DCA.algo.ts:26
+	// contracts/Swap.algo.ts:26
 	// this.orchestratorAddress.value = orchestratorAddress
 	byte 0x6f7263686573747261746f7241646472657373 // "orchestratorAddress"
 	frame_dig -1 // orchestratorAddress: Address
 	app_global_put
 
-	// contracts/DCA.algo.ts:27
+	// contracts/Swap.algo.ts:27
 	// this.userAddress.value = this.txn.sender
 	byte 0x7573657241646472657373 // "userAddress"
 	txn Sender
 	app_global_put
 
-	// contracts/DCA.algo.ts:28
+	// contracts/Swap.algo.ts:28
 	// this.SwapToTokenId.value = swapToken
 	byte 0x53776170546f546f6b656e4964 // "SwapToTokenId"
 	frame_dig -2 // swapToken: uint64
 	app_global_put
 
-	// contracts/DCA.algo.ts:29
+	// contracts/Swap.algo.ts:29
 	// this.swapAmount.value = 0
 	byte 0x73776170416d6f756e74 // "swapAmount"
 	int 0
 	app_global_put
 
-	// contracts/DCA.algo.ts:30
+	// contracts/Swap.algo.ts:30
 	// this.swapManagerAccount.value = swapManagerAccount
 	byte 0x737761704d616e616765724163636f756e74 // "swapManagerAccount"
 	frame_dig -3 // swapManagerAccount: Address
@@ -117,7 +117,7 @@ createApplication:
 deleteApplication:
 	proto 0 0
 
-	// contracts/DCA.algo.ts:35
+	// contracts/Swap.algo.ts:35
 	// assert(this.txn.sender === this.userAddress.value, "Only user can delete application")
 	txn Sender
 	byte 0x7573657241646472657373 // "userAddress"
@@ -143,7 +143,7 @@ deleteApplication:
 optInToAsset:
 	proto 1 0
 
-	// contracts/DCA.algo.ts:39
+	// contracts/Swap.algo.ts:39
 	// assert(this.txn.sender === this.userAddress.value, "Only user can opt contract into asset")
 	txn Sender
 	byte 0x7573657241646472657373 // "userAddress"
@@ -153,7 +153,7 @@ optInToAsset:
 	// Only user can opt contract into asset
 	assert
 
-	// contracts/DCA.algo.ts:41
+	// contracts/Swap.algo.ts:41
 	// sendAssetTransfer({
 	//       xferAsset: asset,
 	//       assetAmount: 0,
@@ -164,22 +164,22 @@ optInToAsset:
 	int axfer
 	itxn_field TypeEnum
 
-	// contracts/DCA.algo.ts:42
+	// contracts/Swap.algo.ts:42
 	// xferAsset: asset
 	frame_dig -1 // asset: AssetID
 	itxn_field XferAsset
 
-	// contracts/DCA.algo.ts:43
+	// contracts/Swap.algo.ts:43
 	// assetAmount: 0
 	int 0
 	itxn_field AssetAmount
 
-	// contracts/DCA.algo.ts:44
+	// contracts/Swap.algo.ts:44
 	// assetReceiver: this.app.address
 	global CurrentApplicationAddress
 	itxn_field AssetReceiver
 
-	// contracts/DCA.algo.ts:45
+	// contracts/Swap.algo.ts:45
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
@@ -219,7 +219,7 @@ optInToAsset:
 addMBR:
 	proto 2 0
 
-	// contracts/DCA.algo.ts:50
+	// contracts/Swap.algo.ts:50
 	// assert(this.txn.sender == this.userAddress.value, "Only user can add MBR")
 	txn Sender
 	byte 0x7573657241646472657373 // "userAddress"
@@ -229,7 +229,7 @@ addMBR:
 	// Only user can add MBR
 	assert
 
-	// contracts/DCA.algo.ts:52
+	// contracts/Swap.algo.ts:52
 	// verifyPayTxn(payTxn, {
 	//       sender: this.userAddress.value,
 	//       receiver: this.app.address,
@@ -263,7 +263,7 @@ addMBR:
 	// transaction verification failed: {"txn":"payTxn","field":"amount","expected":"quantity"}
 	assert
 
-	// contracts/DCA.algo.ts:57
+	// contracts/Swap.algo.ts:57
 	// this.mbr.value += payTxn.amount
 	byte 0x6d6272 // "mbr"
 	app_global_get
@@ -274,7 +274,7 @@ addMBR:
 	swap
 	app_global_put
 
-	// contracts/DCA.algo.ts:58
+	// contracts/Swap.algo.ts:58
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -300,7 +300,7 @@ addMBR:
 setSwapParams:
 	proto 2 0
 
-	// contracts/DCA.algo.ts:62
+	// contracts/Swap.algo.ts:62
 	// assert(this.txn.sender == this.userAddress.value, "Only user can set swap params")
 	txn Sender
 	byte 0x7573657241646472657373 // "userAddress"
@@ -310,19 +310,19 @@ setSwapParams:
 	// Only user can set swap params
 	assert
 
-	// contracts/DCA.algo.ts:64
+	// contracts/Swap.algo.ts:64
 	// this.swapAmount.value = swapAmount
 	byte 0x73776170416d6f756e74 // "swapAmount"
 	frame_dig -1 // swapAmount: uint64
 	app_global_put
 
-	// contracts/DCA.algo.ts:65
+	// contracts/Swap.algo.ts:65
 	// this.SwapToTokenId.value = SwapToTokenId
 	byte 0x53776170546f546f6b656e4964 // "SwapToTokenId"
 	frame_dig -2 // SwapToTokenId: uint64
 	app_global_put
 
-	// contracts/DCA.algo.ts:67
+	// contracts/Swap.algo.ts:67
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -350,7 +350,7 @@ setSwapParams:
 updateSwapManagerAccount:
 	proto 1 0
 
-	// contracts/DCA.algo.ts:71
+	// contracts/Swap.algo.ts:71
 	// assert(this.txn.sender == this.orchestratorAddress.value, "Only orchestrator can update swap manager account")
 	txn Sender
 	byte 0x6f7263686573747261746f7241646472657373 // "orchestratorAddress"
@@ -360,13 +360,13 @@ updateSwapManagerAccount:
 	// Only orchestrator can update swap manager account
 	assert
 
-	// contracts/DCA.algo.ts:73
+	// contracts/Swap.algo.ts:73
 	// this.swapManagerAccount.value = swapManagerAccount
 	byte 0x737761704d616e616765724163636f756e74 // "swapManagerAccount"
 	frame_dig -1 // swapManagerAccount: Address
 	app_global_put
 
-	// contracts/DCA.algo.ts:75
+	// contracts/Swap.algo.ts:75
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -384,7 +384,7 @@ updateSwapManagerAccount:
 initiateSwap:
 	proto 0 0
 
-	// contracts/DCA.algo.ts:79
+	// contracts/Swap.algo.ts:79
 	// assert(this.txn.sender == this.userAddress.value, "Only user can initiate swap")
 	txn Sender
 	byte 0x7573657241646472657373 // "userAddress"
@@ -394,7 +394,7 @@ initiateSwap:
 	// Only user can initiate swap
 	assert
 
-	// contracts/DCA.algo.ts:80
+	// contracts/Swap.algo.ts:80
 	// assert(this.app.address.balance > 0, "Insufficient balance")
 	global CurrentApplicationAddress
 	acct_params_get AcctBalance
@@ -405,7 +405,7 @@ initiateSwap:
 	// Insufficient balance
 	assert
 
-	// contracts/DCA.algo.ts:81
+	// contracts/Swap.algo.ts:81
 	// assert(this.swapAmount.value > 0, "Swap amount not set")
 	byte 0x73776170416d6f756e74 // "swapAmount"
 	app_global_get
@@ -415,7 +415,7 @@ initiateSwap:
 	// Swap amount not set
 	assert
 
-	// contracts/DCA.algo.ts:82
+	// contracts/Swap.algo.ts:82
 	// assert(this.SwapToTokenId.value > 0, "Swap token not set")
 	byte 0x53776170546f546f6b656e4964 // "SwapToTokenId"
 	app_global_get
@@ -425,7 +425,7 @@ initiateSwap:
 	// Swap token not set
 	assert
 
-	// contracts/DCA.algo.ts:83
+	// contracts/Swap.algo.ts:83
 	// assert(this.mbr.value > 0, "Insufficient MBR")
 	byte 0x6d6272 // "mbr"
 	app_global_get
@@ -435,7 +435,7 @@ initiateSwap:
 	// Insufficient MBR
 	assert
 
-	// contracts/DCA.algo.ts:85
+	// contracts/Swap.algo.ts:85
 	// sendPayment({
 	//       amount: this.swapAmount.value,
 	//       sender: this.app.address,
@@ -446,24 +446,24 @@ initiateSwap:
 	int pay
 	itxn_field TypeEnum
 
-	// contracts/DCA.algo.ts:86
+	// contracts/Swap.algo.ts:86
 	// amount: this.swapAmount.value
 	byte 0x73776170416d6f756e74 // "swapAmount"
 	app_global_get
 	itxn_field Amount
 
-	// contracts/DCA.algo.ts:87
+	// contracts/Swap.algo.ts:87
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
 
-	// contracts/DCA.algo.ts:88
+	// contracts/Swap.algo.ts:88
 	// receiver: this.swapManagerAccount.value
 	byte 0x737761704d616e616765724163636f756e74 // "swapManagerAccount"
 	app_global_get
 	itxn_field Receiver
 
-	// contracts/DCA.algo.ts:89
+	// contracts/Swap.algo.ts:89
 	// note: "Swap requested: to, amount: " + this.SwapToTokenId.value + ", " + this.swapAmount.value
 	byte 0x53776170207265717565737465643a20746f2c20616d6f756e743a20 // "Swap requested: to, amount: "
 	byte 0x53776170546f546f6b656e4964 // "SwapToTokenId"
@@ -483,7 +483,7 @@ initiateSwap:
 	// Submit inner transaction
 	itxn_submit
 
-	// contracts/DCA.algo.ts:92
+	// contracts/Swap.algo.ts:92
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -517,7 +517,7 @@ initiateSwap:
 receiveSwap:
 	proto 2 0
 
-	// contracts/DCA.algo.ts:96
+	// contracts/Swap.algo.ts:96
 	// assert(this.txn.sender == this.swapManagerAccount.value, "Only swap manager can send swap tokens")
 	txn Sender
 	byte 0x737761704d616e616765724163636f756e74 // "swapManagerAccount"
@@ -527,7 +527,7 @@ receiveSwap:
 	// Only swap manager can send swap tokens
 	assert
 
-	// contracts/DCA.algo.ts:98
+	// contracts/Swap.algo.ts:98
 	// verifyAssetTransferTxn(axferTxn, {
 	//       sender: this.swapManagerAccount.value,
 	//       assetReceiver: this.app.address,
@@ -590,7 +590,7 @@ receiveSwap:
 	// transaction verification failed: {"txn":"axferTxn","field":"note","expected":"axferTxn.xferAsset.id.toString() + \", \" + axferTxn.assetAmount.toString()"}
 	assert
 
-	// contracts/DCA.algo.ts:106
+	// contracts/Swap.algo.ts:106
 	// this.swappedTokenBalance.value += axferTxn.assetAmount
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	app_global_get
@@ -601,7 +601,7 @@ receiveSwap:
 	swap
 	app_global_put
 
-	// contracts/DCA.algo.ts:107
+	// contracts/Swap.algo.ts:107
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp
@@ -629,7 +629,7 @@ receiveSwap:
 sendSwappedTokens:
 	proto 1 0
 
-	// contracts/DCA.algo.ts:111
+	// contracts/Swap.algo.ts:111
 	// assert(this.txn.sender == this.orchestratorAddress.value, "Only orchestrator can send swapped tokens to nominated accounts")
 	txn Sender
 	byte 0x6f7263686573747261746f7241646472657373 // "orchestratorAddress"
@@ -639,7 +639,7 @@ sendSwappedTokens:
 	// Only orchestrator can send swapped tokens to nominated accounts
 	assert
 
-	// contracts/DCA.algo.ts:112
+	// contracts/Swap.algo.ts:112
 	// assert(this.swappedTokenBalance.value > 0, "Insufficient swapped tokens")
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	app_global_get
@@ -649,7 +649,7 @@ sendSwappedTokens:
 	// Insufficient swapped tokens
 	assert
 
-	// contracts/DCA.algo.ts:113
+	// contracts/Swap.algo.ts:113
 	// assert(this.mbr.value > 0, "Insufficient MBR")
 	byte 0x6d6272 // "mbr"
 	app_global_get
@@ -659,7 +659,7 @@ sendSwappedTokens:
 	// Insufficient MBR
 	assert
 
-	// contracts/DCA.algo.ts:115
+	// contracts/Swap.algo.ts:115
 	// sendAssetTransfer({
 	//       sender: this.app.address,
 	//       assetReceiver: sendToAddress,
@@ -671,29 +671,29 @@ sendSwappedTokens:
 	int axfer
 	itxn_field TypeEnum
 
-	// contracts/DCA.algo.ts:116
+	// contracts/Swap.algo.ts:116
 	// sender: this.app.address
 	global CurrentApplicationAddress
 	itxn_field Sender
 
-	// contracts/DCA.algo.ts:117
+	// contracts/Swap.algo.ts:117
 	// assetReceiver: sendToAddress
 	frame_dig -1 // sendToAddress: Address
 	itxn_field AssetReceiver
 
-	// contracts/DCA.algo.ts:118
+	// contracts/Swap.algo.ts:118
 	// assetAmount: this.swappedTokenBalance.value
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	app_global_get
 	itxn_field AssetAmount
 
-	// contracts/DCA.algo.ts:119
+	// contracts/Swap.algo.ts:119
 	// xferAsset: AssetID.fromUint64(this.SwapToTokenId.value)
 	byte 0x53776170546f546f6b656e4964 // "SwapToTokenId"
 	app_global_get
 	itxn_field XferAsset
 
-	// contracts/DCA.algo.ts:120
+	// contracts/Swap.algo.ts:120
 	// note: "Swapped tokens sent to " + sendToAddress
 	byte 0x5377617070656420746f6b656e732073656e7420746f20 // "Swapped tokens sent to "
 	frame_dig -1 // sendToAddress: Address
@@ -707,13 +707,13 @@ sendSwappedTokens:
 	// Submit inner transaction
 	itxn_submit
 
-	// contracts/DCA.algo.ts:123
+	// contracts/Swap.algo.ts:123
 	// this.swappedTokenBalance.value = 0
 	byte 0x73776170706564546f6b656e42616c616e6365 // "swappedTokenBalance"
 	int 0
 	app_global_put
 
-	// contracts/DCA.algo.ts:124
+	// contracts/Swap.algo.ts:124
 	// this.lastUpdated.value = globals.latestTimestamp
 	byte 0x6c61737455706461746564 // "lastUpdated"
 	global LatestTimestamp

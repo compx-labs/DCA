@@ -1,6 +1,6 @@
 import { Contract } from '@algorandfoundation/tealscript';
 
-export class DCA extends Contract {
+export class Swap extends Contract {
   programVersion = 9;
 
   mbr = GlobalStateKey<uint64>();

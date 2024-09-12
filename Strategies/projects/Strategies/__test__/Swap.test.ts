@@ -1,14 +1,14 @@
 import { describe, test, expect, beforeAll, beforeEach } from '@jest/globals';
 import { algorandFixture } from '@algorandfoundation/algokit-utils/testing';
 import * as algokit from '@algorandfoundation/algokit-utils';
-import { DcaClient } from '../contracts/clients/DCAClient';
+import { SwapClient } from '../contracts/clients/SwapClient';
 
 const fixture = algorandFixture();
 algokit.Config.configure({ populateAppCallResources: true });
 
-let appClient: DcaClient;
+let appClient: SwapClient;
 
-describe('DCA', () => {
+describe('Swap', () => {
   beforeEach(fixture.beforeEach);
 
   /* beforeAll(async () => {
