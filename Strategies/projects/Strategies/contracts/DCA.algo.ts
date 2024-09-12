@@ -80,7 +80,7 @@ export class DCA extends Contract {
     this.lastUpdated.value = globals.latestTimestamp;
   }
 
-  receiveSwap(axferTxn: AssetTransferTxn, quantity: uint64): void {
+  receiveSwapAndSendOn(axferTxn: AssetTransferTxn, quantity: uint64): void {
     assert(this.txn.sender == this.swapManagerAccount.value, "Only swap manager can send swap tokens");
 
     verifyAssetTransferTxn(axferTxn, {
@@ -95,24 +95,19 @@ export class DCA extends Contract {
     this.lastUpdated.value = globals.latestTimestamp;
   }
 
-  sendSwappedTokens(quantity: uint64, sendToAddress: Address): void {
+  sendSwappedTokens(sendToAddress: Address): void {
     assert(this.txn.sender == this.orchestratorAddress.value, "Only orchestrator can send swapped tokens to nominated accounts");
-    assert(this.swappedTokenBalance.value >= quantity, "Insufficient swapped tokens");
-
-    let amount = quantity;
-    if (quantity === 0) {
-      amount = this.swappedTokenBalance.value;
-    }
+    assert(this.swappedTokenBalance.value > 0, "Insufficient swapped tokens");
 
     sendAssetTransfer({
       sender: this.app.address,
       assetReceiver: sendToAddress,
-      assetAmount: amount,
+      assetAmount: this.swappedTokenBalance.value,
       xferAsset: AssetID.fromUint64(this.SwapToTokenId.value),
       note: "Swapped tokens sent to " + sendToAddress,
     })
 
-    this.swappedTokenBalance.value -= amount;
+    this.swappedTokenBalance.value = 0;
     this.lastUpdated.value = globals.latestTimestamp;
   }
 
